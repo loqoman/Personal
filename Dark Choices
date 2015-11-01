@@ -1,0 +1,16 @@
+#---------------Inination code ver 0.1-------------
+
+import pygame,sys, time, random
+from pygame.locals import *
+
+pygame.init()
+
+BUTTONCOLOR = (50, 205, 50)
+WINDOWWIDTH = (400)
+WINDOWHEIGHT = (400)
+windowSurface = pygame.display.set_mode([WINDOWWIDTH, WINDOWHEIGHT])
+#--------------------Game Loop ver 0.1-------------------
+
+class Button(object):
+
+    
