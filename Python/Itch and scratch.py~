@@ -153,7 +153,7 @@ while True:
     #if (temp_paint  > 0): 
      #   paint = temp_paint
     #print(temp_paint)
-    temp_X_pot = square_x()
+    temp_X_pot = square_x()#Start of somthing wierd happening...
     if (temp_X_pot > 0):
         X_pot = temp_X_pot
     X_pot = (X_pot / (MAX_POT / WINDOWWIDTH))# If doing C++ make float

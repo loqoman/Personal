@@ -47,6 +47,7 @@ Serial.println();
 delay(100);
 }
 
+
 long microsecondsToInches(long microseconds)
 {
 // According to Parallax's datasheet for the PING))), there are
