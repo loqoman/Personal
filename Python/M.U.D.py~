@@ -1,6 +1,6 @@
 
 #-----Use this for the start for any new program---------#
-import pygame, sys, time , random , math
+import pygame, sys, time , random , math, os 
 from pygame.locals import *
 
 # set up pygame
@@ -36,11 +36,12 @@ CHOCLATE = (210,105,30)
 BACKGROUND = CHOCLATE
 
 # Set up the  window itself
+'''
 #windowSurface = pygame.display.set_mode( (WINDOWWIDTH,WINDOWHEIGHT),0,32)
 #pygame.display.set_caption('Some cool sounding name')   #--I dont really need pygame for this. --#
-
+'''
 #Used if the program uses keys
-pygame.key.set_repeat(200,100)
+#pygame.key.set_repeat(200,100)
 
 
 # this set the background to so it won't be black
@@ -58,15 +59,25 @@ class Player(object):
 	def say(self, words):
 		print(words)
 class NPC(object):   # the idea is to have the NPC something like:  <townie1 = NPC(Bob, man)>
-	def __init__(self, name = 'NPC' ,layerN1,trait):
-		self.name = name
+	def __init__(self, name = 'NPC' ,layerN1 = "NPC",trait = 'aggressive'):
+		self.name = layerN1
 		self.trait = trait
-		self.Layer_Name_1 = layerN1
+		self.Layer_Name_1 = name
+		print(layerN1)
+
 	def say(self, words):
-		print(name + ": " + words)
+	
+		print(self.name + ": " + words)
+	
+	def learn(self,player):
+
+		#print(layerN1)
+		self.name = self.Layer_Name_1
+
+	def ask(self, question = 'name?'):
+		self.say(question)
 class Item(object):
-	def __init__ (self, title = 0, weapon = 'gun' ,DMG_min = 0, DMG_max = 10):
-		self.name = name
+	def __init__ (self, title = 0, weapon = 'gun' ,DMG_min = 0, DMG_max = 10):# No name on the gun because the gun itself should be a name#
 		self.weapon = weapon
 		self.DMG_min = DMG_min
 		self.DMG_max = DMG_max
@@ -74,10 +85,17 @@ class Item(object):
 
 plasma = Item(title = 'hevenly', weapon = 'gun', DMG_min = 3, DMG_max = 10)
 
-IntroGuide = NCP( Sylva-sylver-spring, Space-worker)
+IntroGuide = NPC(name = 'Sylva-sylver-spring' , layerN1 = "Space-worker")# still not shure what the difference between ' and " is
 
+os.system('clear')
+
+# -- Start of printing test --# 
 IntroGuide.say ("Hello?")
-	
+time.sleep(1)
+IntroGuide.learn(player = "null")
+time.sleep(1)
+IntroGuide.ask()
+
 
 		
 
