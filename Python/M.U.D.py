@@ -68,34 +68,53 @@ class NPC(object):   # the idea is to have the NPC something like:  <townie1 = N
 	def say(self, words):
 	
 		print(self.name + ": " + words)
-	
 	def learn(self,player):
 
-		#print(layerN1)
-		self.name = self.Layer_Name_1
-
-	def ask(self, question = 'name?'):
-		self.say(question)
+        	self.name = self.Layer_Name_1
+        
+	def ask(self, question):
+    
+        	responce =  input(self.name + ': ' + question + '\n')
+        	return(responce)
+    
 class Item(object):
-	def __init__ (self, title = 0, weapon = 'gun' ,DMG_min = 0, DMG_max = 10):# No name on the gun because the gun itself should be a name#
+	def __init__ (self, title = 0, weapon = 'gun' ,DMG_min = 0, DMG_max = 10):# No name on the gun because the gun itself should be a name as defined in the __init_#
 		self.weapon = weapon
 		self.DMG_min = DMG_min
 		self.DMG_max = DMG_max
+class skills(object):
+	def __init__(self):
+		skills = []
+	def add(skill,level):
+		skills.append(skill)
+		skills.append(level)
+ 
+		
+
 
 
 plasma = Item(title = 'hevenly', weapon = 'gun', DMG_min = 3, DMG_max = 10)
 
+Narritor = NPC(name = 'narritor', layerN1 = 'narritor')
 IntroGuide = NPC(name = 'Sylva-sylver-spring' , layerN1 = "Space-worker")# still not shure what the difference between ' and " is
 
 os.system('clear')
-
 # -- Start of printing test --# 
+Narritor.say("You come to, feeling groggy and have to blink you eyes a few times to wake up")
+time.sleep(3)
+Narritor.say("You see a huminiod figure waving what looks like a flat device over some shiny flat square")
+time.sleep(3)
 IntroGuide.say ("Hello?")
 time.sleep(1)
-IntroGuide.learn(player = "null" /l)
+IntroGuide.learn(player = "null" )
 time.sleep(1)
-IntroGuide.ask()
+print(IntroGuide.ask('How old are you?'))
+skills.add('eating','2')
+skills.add('looking','1')
+skills.add('pooping','3')
+for int in skills:
+	print(int)
 
 
-		
+
 
