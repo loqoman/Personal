@@ -75,7 +75,7 @@ class NPC(object):   # the idea is to have the NPC something like:  <townie1 = N
 	def ask(self, question):
     
         	responce =  input(self.name + ': ' + question + '\n')
-        	return(responce)
+        	return(sresponce)
     
 class Item(object):
 	def __init__ (self, title = 0, weapon = 'gun' ,DMG_min = 0, DMG_max = 10):# No name on the gun because the gun itself should be a name as defined in the __init_#
