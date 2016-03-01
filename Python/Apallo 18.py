@@ -809,12 +809,16 @@ class Building(Widget):
         self.y = y
         self.topLeftX = topLeftX
         self.topLeftY = topLeftY
+        self.phont_size = phont_size
 
         topLeft = (topLeftX,topLeftY)
         building = pygame.image.load(img).convert()
         scaled_building = pygame.transform.scale(building,(x,y))
 
         pygame.Surface.blit(windowSurface,scaled_building,topLeft)
+
+        Label = Text(font_size = self.phont_size, topleft = (self.topLeftX,self.topLeftY - 13), max_chars = 10 ,text = label,justify =
+        'LEFT',outline = False)
 
     def build(self,build):
         pos = pygame.mouse.get_pos()
@@ -829,9 +833,7 @@ class Building(Widget):
             
 #---------------
         
-    Label = Text(font_size = 20,topleft = (topLeftX -
-    20,topLeftY - 20), max_chars = 11 ,text = label,justify =
-    'LEFT',outline = True)
+
         
 
     def handler(self):
@@ -847,7 +849,7 @@ class Building(Widget):
 Command_bar_background = Rectangle(window = windowSurface,topleft = (0,550), width = WINDOWWIDTH, height = 5000,color = GOLD,outline_width = 0 )
 
 Solar_Panel = Building(img = 'solarPanel.jpg',
-                       x=75,y=75,topLeftX = 45, topLeftY = 600, label = 'solar panel',phont_size = 20,)
+                       x=75,y=75,topLeftX = 45, topLeftY = 600, label = 'solar panel',phont_size = 20)
 
 
 
