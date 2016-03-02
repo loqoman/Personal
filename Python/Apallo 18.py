@@ -817,28 +817,26 @@ class Building(Widget):
 
         pygame.Surface.blit(windowSurface,scaled_building,topLeft)
 
-        Label = Text(font_size = self.phont_size, topleft = (self.topLeftX,self.topLeftY - 13), max_chars = 10 ,text = label,justify =
+        Label = Text(color=BLACK,background_color=GOLD,font_size = self.phont_size, topleft = (self.topLeftX,self.topLeftY - 13), max_chars = 10 ,text = label,justify =
         'LEFT',outline = False)
 
-    def build(self,build):
-        pos = pygame.mouse.get_pos()
-        if (pos[1] < 550):
-            while True:
-                pygame.Surface.blit(windowSurface,scaled_building,(foo))
-                for event in pygame.event.get():
-                    if event.type == MOUSEBUTTONDOWN:
-                        break
 
         
-            
+
+        
+    def draw(self):
+        while True:
+            print("You got this far!")
+            time.sleep(.1)
+            pos = pygame.mouse.get_pos()
+            #pygame.Surface.blit(windowSurface,scaled_building,(pos))
+            pygame.draw.rect(windowSurface, GOLD, (pos,20,20), 0)
 #---------------
         
 
         
 
-    def handler(self):
-        self.build()
-
+        
 #-----End of class defineing section-------------#
 '''
 
@@ -873,8 +871,8 @@ while True:
 
                 if widget_object.isclicked(pos):
                     widget_object.handler() 
-    
-
+    Solar_Panel.draw
+    print(pygame.mouse.get_pos())
     time.sleep(.1) # just kill a bit of time
     pygame.display.update()
 
