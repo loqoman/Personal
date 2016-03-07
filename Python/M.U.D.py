@@ -75,14 +75,14 @@ class NPC(object):   # the idea is to have the NPC something like:  <townie1 = N
 	def ask(self, question):
     
         	responce =  input(self.name + ': ' + question + '\n')
-        	return(sresponce)
+        	return(responce)
     
 class Item(object):
 	def __init__ (self, title = 0, weapon = 'gun' ,DMG_min = 0, DMG_max = 10):# No name on the gun because the gun itself should be a name as defined in the __init_#
 		self.weapon = weapon
 		self.DMG_min = DMG_min
 		self.DMG_max = DMG_max
-class skills(object):
+class skill(object):
 	def __init__(self):
 		skills = []
 	def add(skill,level):
@@ -99,6 +99,7 @@ Narritor = NPC(name = 'narritor', layerN1 = 'narritor')
 IntroGuide = NPC(name = 'Sylva-sylver-spring' , layerN1 = "Space-worker")# still not shure what the difference between ' and " is
 
 os.system('clear')
+
 # -- Start of printing test --# 
 Narritor.say("You come to, feeling groggy and have to blink you eyes a few times to wake up")
 time.sleep(3)
@@ -109,10 +110,10 @@ time.sleep(1)
 IntroGuide.learn(player = "null" )
 time.sleep(1)
 print(IntroGuide.ask('How old are you?'))
-skills.add('eating','2')
-skills.add('looking','1')
-skills.add('pooping','3')
-for int in skills:
+skill.add('eating','2')
+skill.add('looking','1')
+skill.add('pooping','3')
+for int in skill:
 	print(int)
 
 
