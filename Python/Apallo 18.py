@@ -864,11 +864,13 @@ while True:
         if event.type == MOUSEBUTTONDOWN:
             
             pos = pygame.mouse.get_pos() # mouse clicked get (x, y)
+            Solar_Panel.draw
 
             # check through widget dictionary and call handler if clicked
             for widgetname in Widget.widgetlist:
+                pos = pygame.mouse.get_pos() # mouse clicked get (x, y)
                 widget_object = Widget.find_widget(widgetname)
-
+                
                 if widget_object.isclicked(pos):
                     widget_object.handler() 
     Solar_Panel.draw
