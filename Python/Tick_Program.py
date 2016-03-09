@@ -32,6 +32,8 @@ VIOLET = (238,130,238)
 SALMON = (250,128,114)
 GOLD = (255,165,0)
 CHOCLATE = (210,105,30)
+
+current_t = 0
 BACKGROUND = CHOCLATE
 
 # Set up the  window itself
@@ -96,30 +98,35 @@ class Widget(object):
     
 class tick(object):
 
-    t_history = []
-    currnet_t = 0
+    global current_t
+
     def init(name = "ticks"):
         self.name = name
-
+        t_history = []
+        global current_t
 
     def tick_advance(self):
+        global current_t
         current_t += 1
-        t_history.append(current_t)
+        #t_history.append(current_t)
+        
     def return_current_tick(self):
         return str(current_t)
-
-all_fonts = pygame.font.get_fonts()
+        
+    def show_ticks(self,Cords):
+        cover = pygame.rect
+        font = pygame.font.SysFont("comicsansms", 72)
+        label = font.render(Ticks.return_current_tick(), 1, (255,255,0))
+        windowSurface.blit(label,Cords)
+        all_fonts = pygame.font.get_fonts()
 
 Ticks = tick()
 #----start of the game loop---------#
 while True:
     # check for the QUIT  or mouse event
 
-    font = pygame.font.SysFont("comicsansms", 72)
-    text = font.render(Ticks.return_current_tick, True, (0, 128, 0))
-    windowSurface.blit(text,(20,20,20,20))
-        
-    
+    Ticks.show_ticks((20,20,20,20))
+    time.sleep(2)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:
