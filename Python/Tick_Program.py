@@ -34,7 +34,7 @@ GOLD = (255,165,0)
 CHOCLATE = (210,105,30)
 
 current_t = 0
-BACKGROUND = CHOCLATE
+BACKGROUND = BLACK
 
 # Set up the  window itself
 windowSurface = pygame.display.set_mode( (WINDOWWIDTH,WINDOWHEIGHT),0,32)
@@ -42,7 +42,7 @@ pygame.display.set_caption('Some cool sounding name')
 
 #Used if the program uses keys
 pygame.key.set_repeat(200,100)
-
+    
 
 # this set the background to so it won't be black
 # you can choose the color of your preference
@@ -101,15 +101,7 @@ class Timer(object):
 
     timers = []  # create an empty list of all timers
 
-    def process():
-    # Timer processor, called from the main loop at the class
-    # level to process timers
-        for timer_object in Timer.timers:
-            if timer_object.delay > 0.0: # timer is active
-                if (time.time() - timer_object.start_time) > timer_object.delay:
-                    # timer has timed outclass Timer(object):
 
-    timers = []  # create an empty list of all timers
 
     def process():
     # Timer processor, called from the main loop at the class
@@ -139,7 +131,7 @@ class Timer(object):
 
     def set(self,delay,handler='',repeat=False):
     # set a timer, optionally associate a handler with it
-        self.delay = delay   # time period in seconds
+        self.delay = delay   # time period in seconds WHY IS THIS CALLED DELAY?!?!?! I need to fuckign change that
         self.handler = handler
         self.repeat = repeat
         self.start_time = time.time()
@@ -156,13 +148,12 @@ class Timer(object):
     # cancel a timer
         self.delay = 0.0
         self.state = False
-
-                    timer_object.state = True
-                    timer_object.start_time = time.time()
-                    if not (timer_object.handler == ''): # see if handler exists
-                        timer_object.handler() # call the handler
-                    if not timer_object.repeat:
-                        timer_object.delay = 0.0
+        timer_object.state = True
+        timer_object.start_time = time.time()
+        if not (timer_object.handler == ''): # see if handler exists
+            timer_object.handler() # call the handler
+            if not timer_object.repeat:
+                timer_object.delay = 0.0
                     # else leave the delay in place so it will repeat
 
     def __init__(self,name='',handler='',repeat=False):
@@ -198,29 +189,33 @@ class Timer(object):
 #---------------------END OF TIMERS------------------------------#
         
 #---------Everything byond this point is being prototyped-----------#
+
+ticksPerSec = Timer(name = '20tps', repeat = True)# I only ever want 20 TPS so using this calss im able to do so.
+
+
 class tick(object):
 
     global current_t # Need the global stuff because otherwise it cant read outside of this varible
+    #print('foo')
 
     def init(name = "ticks"):
         self.name = name
         t_history = []
         global current_t
+        ticksPerSec.set(delay = .05,repeat = True)
 
     def tick_advance(self): # ONLY ever adds to the current tick and appends to the tick list.
         global current_t    # I think in the future I want the tick list to come back, be able to read back into histroy and find out what happened during that time.
-        current_t += 1
         #t_history.append(current_t)
+        if ticksPerSec.check_state():
+            current_t += 1
+            
 
-    def process(self):
-        20sec = Timer 
-
-        
     def return_current_tick(self):
         return str(current_t)
         
     def show_ticks(self,Cords, font_size):
-        pygame.draw.rect(windowSurface, BACKGROUND, (Cords[0], Cords[1],font_size,font_size ), 0) # Drawing over
+        pygame.draw.rect(windowSurface, BACKGROUND, (Cords[0], Cords[1],font_size + 50,font_size + 10 ), 0) # Drawing over the last number
         font = pygame.font.SysFont("comicsansms", font_size )
 
 
@@ -235,9 +230,11 @@ Ticks = tick()
 while True:
     # check for the QUIT  or mouse event
     Timer.process()
+    
     Ticks.show_ticks((20,20,20,20), 15)
     
     Ticks.tick_advance()
+    
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:
