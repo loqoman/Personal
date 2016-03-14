@@ -94,28 +94,138 @@ class Widget(object):
 
     def handler(self):
     # prototype for a widget handler to be overridden if desired
-        pass     
-    
+        pass
+
+#--------------YAY TIMERS!------------------#    
+class Timer(object):
+
+    timers = []  # create an empty list of all timers
+
+    def process():
+    # Timer processor, called from the main loop at the class
+    # level to process timers
+        for timer_object in Timer.timers:
+            if timer_object.delay > 0.0: # timer is active
+                if (time.time() - timer_object.start_time) > timer_object.delay:
+                    # timer has timed outclass Timer(object):
+
+    timers = []  # create an empty list of all timers
+
+    def process():
+    # Timer processor, called from the main loop at the class
+    # level to process timers
+        for timer_object in Timer.timers:
+            if timer_object.delay > 0.0: # timer is active
+                if (time.time() - timer_object.start_time) > timer_object.delay:
+                    # timer has timed out
+                    timer_object.state = True
+                    timer_object.start_time = time.time()
+                    if not (timer_object.handler == ''): # see if handler exists
+                        timer_object.handler() # call the handler
+                    if not timer_object.repeat:
+                        timer_object.delay = 0.0
+                    # else leave the delay in place so it will repeat
+
+    def __init__(self,name='',handler='',repeat=False):
+    # constructor for timer, must set with .set() method
+        self.name = name
+        self.start_time = time.time()
+        self.delay = 0.0
+        self.handler = ''
+        self.repeat = repeat
+        self.state = False  # show time not timed out
+        Timer.timers += [self] # add timer object to the list of timers
+        
+
+    def set(self,delay,handler='',repeat=False):
+    # set a timer, optionally associate a handler with it
+        self.delay = delay   # time period in seconds
+        self.handler = handler
+        self.repeat = repeat
+        self.start_time = time.time()
+
+    def check_state(self):
+    # check the state of the timer, return true if timed out
+        return self.state
+
+    def reset_state(self):
+    # reset the state of the counter to false
+        self.state = False
+        
+    def cancel(self):
+    # cancel a timer
+        self.delay = 0.0
+        self.state = False
+
+                    timer_object.state = True
+                    timer_object.start_time = time.time()
+                    if not (timer_object.handler == ''): # see if handler exists
+                        timer_object.handler() # call the handler
+                    if not timer_object.repeat:
+                        timer_object.delay = 0.0
+                    # else leave the delay in place so it will repeat
+
+    def __init__(self,name='',handler='',repeat=False):
+    # constructor for timer, must set with .set() method
+        self.name = name
+        self.start_time = time.time()
+        self.delay = 0.0
+        self.handler = ''
+        self.repeat = repeat
+        self.state = False  # show time not timed out
+        Timer.timers += [self] # add timer object to the list of timers
+        
+
+    def set(self,delay,handler='',repeat=False):
+    # set a timer, optionally associate a handler with it
+        self.delay = delay   # time period in seconds
+        self.handler = handler
+        self.repeat = repeat
+        self.start_time = time.time()
+
+    def check_state(self):
+    # check the state of the timer, return true if timed out
+        return self.state
+
+    def reset_state(self):
+    # reset the state of the counter to false
+        self.state = False
+        
+    def cancel(self):
+    # cancel a timer
+        self.delay = 0.0
+        self.state = False
+#---------------------END OF TIMERS------------------------------#
+        
+#---------Everything byond this point is being prototyped-----------#
 class tick(object):
 
-    global current_t
+    global current_t # Need the global stuff because otherwise it cant read outside of this varible
 
     def init(name = "ticks"):
         self.name = name
         t_history = []
         global current_t
 
-    def tick_advance(self):
-        global current_t
+    def tick_advance(self): # ONLY ever adds to the current tick and appends to the tick list.
+        global current_t    # I think in the future I want the tick list to come back, be able to read back into histroy and find out what happened during that time.
         current_t += 1
         #t_history.append(current_t)
+
+    def process(self):
+        20sec = Timer 
+
         
     def return_current_tick(self):
         return str(current_t)
         
-    def show_ticks(self,Cords):
-        cover = pygame.rect
-        font = pygame.font.SysFont("comicsansms", 72)
+    def show_ticks(self,Cords, font_size):
+        pygame.draw.rect(windowSurface, BACKGROUND, (Cords[0], Cords[1],font_size,font_size ), 0) # Drawing over
+        font = pygame.font.SysFont("comicsansms", font_size )
+
+
+
+
         label = font.render(Ticks.return_current_tick(), 1, (255,255,0))
         windowSurface.blit(label,Cords)
         all_fonts = pygame.font.get_fonts()
@@ -124,9 +234,10 @@ Ticks = tick()
 #----start of the game loop---------#
 while True:
     # check for the QUIT  or mouse event
-
-    Ticks.show_ticks((20,20,20,20))
-    time.sleep(2)
+    Timer.process()
+    Ticks.show_ticks((20,20,20,20), 15)
+    
+    Ticks.tick_advance()
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == QUIT:
