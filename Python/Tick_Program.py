@@ -34,6 +34,7 @@ GOLD = (255,165,0)
 CHOCLATE = (210,105,30)
 
 current_t = 0
+test = 'you made it this far'
 BACKGROUND = BLACK
 
 # Set up the  window itself
@@ -101,14 +102,15 @@ class Timer(object):
 
     timers = []  # create an empty list of all timers
 
-
+    print(timers)
+    
 
     def process():
     # Timer processor, called from the main loop at the class
     # level to process timers
         for timer_object in Timer.timers:
             if timer_object.delay > 0.0: # timer is active
-                if (time.time() - timer_object.start_time) > timer_object.delay:
+                if (time.time() - timer_object.start_time) >= timer_object.delay:
                     # timer has timed out
                     timer_object.state = True
                     timer_object.start_time = time.time()
@@ -190,7 +192,7 @@ class Timer(object):
         
 #---------Everything byond this point is being prototyped-----------#
 
-ticksPerSec = Timer(name = '20tps', repeat = True)# I only ever want 20 TPS so using this calss im able to do so.
+ticksPerSec = Timer()# I only ever want 20 TPS so using this calss im able to do so.
 
 
 class tick(object):
@@ -202,7 +204,7 @@ class tick(object):
         self.name = name
         t_history = []
         global current_t
-        ticksPerSec.set(delay = .05,repeat = True)
+        ticksPerSec.set( .05,repeat=True)
 
     def tick_advance(self): # ONLY ever adds to the current tick and appends to the tick list.
         global current_t    # I think in the future I want the tick list to come back, be able to read back into histroy and find out what happened during that time.
@@ -229,6 +231,7 @@ Ticks = tick()
 #----start of the game loop---------#
 while True:
     # check for the QUIT  or mouse event
+    #print(ticksPerSec.check_state())
     Timer.process()
     
     Ticks.show_ticks((20,20,20,20), 15)
