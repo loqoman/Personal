@@ -1,4 +1,4 @@
-''' Some useful things for Dark Choices
+f''' Some useful things for Dark Choices
 With addition of the show buttons to show about other windows'''
 #--------Things to do that I am writeing down so that I dont froget----
 # Change color of scroll                                              |
