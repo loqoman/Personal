@@ -209,8 +209,10 @@ class tick(object):
     def tick_advance(self): # ONLY ever adds to the current tick and appends to the tick list.
         global current_t    # I think in the future I want the tick list to come back, be able to read back into histroy and find out what happened during that time.
         #t_history.append(current_t)
-        if ticksPerSec.check_state():
-            current_t += 1
+        #if ticksPerSec.check_state():
+        time.sleep(.05)#I think with this little of delay it wont impede the program itself,
+                       # however In the future I might want to move over to the timer class.
+        current_t += -1
             
 
     def return_current_tick(self):
