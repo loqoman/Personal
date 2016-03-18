@@ -18,3 +18,7 @@ Code wise I want to work on the following things:
 
  -Changing the names of some of the tick commands
  -Add an example thing that checks for something to show ticks in process
+
+Edit:
+
+~Can I use the same cool dashey thingy?~
