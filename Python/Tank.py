@@ -23,7 +23,7 @@ WINDOWWIDTH = 1250
 WINDOWHEIGHT = 750
 
 NUMBERMINES = 5     # NUMBER OF MINES TO SPRINKLE AROUND
-NUMBERROBOTS = 10     # NUMBER OF ROBOT TANKS TO SPRINKLE AROUND
+NUMBERROBOTS = 50     # NUMBER OF ROBOT TANKS TO SPRINKLE AROUND
 BULLETSPEED = 10     # SPEED OF THE BULLET IN PIXELS PER UPDATE
 
 windowSurface = pygame.display.set_mode([WINDOWWIDTH, WINDOWHEIGHT])
@@ -602,7 +602,7 @@ def update_scores(tank1,tank2):
 # Initialize things before the loop
 
 pygame.key.set_repeat(500,50) # 500 msec 'til repeat then 20 times a second
-
+#pygame.key.set_repeat(0,0) 
 # Create the tanks
 tank1_home = ( WINDOWWIDTH-100,int(WINDOWHEIGHT/2))
 tank1 = Tank(direction=90,speed=0,color=YELLOW,
