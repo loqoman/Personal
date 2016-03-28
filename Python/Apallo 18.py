@@ -1,3 +1,8 @@
+'''
+An RTS game based on surviving on an alein planet with a small amound of civilans.
+
+Phew...it will take a while to get there...
+'''
 #-----Use this for the start for any new program---------#
 import pygame, sys, time , random , math
 from pygame.locals import *

@@ -1,7 +1,14 @@
-''' Tanks - beta version by Darwin I and Darwin II
+#--------#
+'''
+Tanks - beta version by Darwin I and Darwin II
     ver 0.1 intitial beta
-    ver 0.2 add robot tanks                      '''
+    ver 0.2 add robot tanks
+    ver 0.3 Singleplayer Support
 
+
+
+'''
+#--------#
 import pygame, sys, time, random,math
 from pygame.locals import *
 
@@ -29,6 +36,8 @@ BULLETSPEED = 10     # SPEED OF THE BULLET IN PIXELS PER UPDATE
 windowSurface = pygame.display.set_mode([WINDOWWIDTH, WINDOWHEIGHT])
 pygame.display.set_caption('Tanks')
 
+print('What gamemode is this?(Note, currently only singleplayer is supported :p)')
+gamemode = input('1 for single and 2 for 2 player\n')
 #-------------------- Tank Class ver 0.2------------------------------------------
 class Tank(object):
 # Tank class to define a battle tank. Turret direction indicates move and shoot
@@ -583,12 +592,13 @@ def update_scores(tank1,tank2):
     write_text(text='Tank2 ammo '+str(tank2.ammo),topleft=tank2_ammo_topleft,
                font_size=25,color=RED)
 
-    write_text(text='Tank1 lives left '+str(tank1.lives),
-               topleft= tank1_lives_topleft,              
-               font_size=25,color=YELLOW)
-    write_text(text='Tank1 ammo '+str(tank1.ammo),
-               topleft=tank1_ammo_topleft,              
-               font_size=25,color=YELLOW)
+    if gamemode == '2':
+        write_text(text='Tank1 lives left '+str(tank1.lives),
+                   topleft= tank1_lives_topleft,              
+                   font_size=25,color=YELLOW)
+        write_text(text='Tank1 ammo '+str(tank1.ammo),
+                   topleft=tank1_ammo_topleft,              
+                   font_size=25,color=YELLOW)
 
     pygame.display.update()
 
@@ -604,16 +614,17 @@ def update_scores(tank1,tank2):
 pygame.key.set_repeat(500,50) # 500 msec 'til repeat then 20 times a second
 #pygame.key.set_repeat(0,0) 
 # Create the tanks
-tank1_home = ( WINDOWWIDTH-100,int(WINDOWHEIGHT/2))
-tank1 = Tank(direction=90,speed=0,color=YELLOW,
-             center=tank1_home,lives=5,ammo=60 )
-
+if gamemode == '2':
+    tank1_home = ( WINDOWWIDTH-100,int(WINDOWHEIGHT/2))
+    tank1 = Tank(direction=90,speed=0,color=YELLOW,
+                 center=tank1_home,lives=5,ammo=60 )
 tank2_home = (100,int(WINDOWHEIGHT/2))
 tank2 = Tank(direction=90,speed=0,color=RED,
              center =tank2_home,lives=5,ammo=60)
 
 # Create the barriers, starting with the home barriers
-Barrier(left=tank1_home[0]-25,top=tank1_home[1]-50,size=(10,100),color=WHITE)
+if gamemode == '2':
+    Barrier(left=tank1_home[0]-25,top=tank1_home[1]-50,size=(10,100),color=WHITE)
 Barrier(left=tank2_home[0]+25,top=tank1_home[1]-50,size=(10,100),color=WHITE)
 
 Barrier(left=500,top=250,size=(20,75),color=WHITE)  # create a barrier for test
@@ -636,7 +647,8 @@ if NUMBERMINES > 0:
 Mine.flash_all(period=0,flashtime=5) # give folks a peek to start with
 
 #  Main game loop, runs until window x'd out or someone wins
-update_scores(tank1,tank2)   # put up initial scores
+if gamemode == '2':
+    update_scores(tank2,tank2)   # put up initial scores
 
 while True:
     for event in pygame.event.get():
@@ -658,33 +670,39 @@ while True:
                 tank1.speed_up()
             elif(key == 'right ctrl'): # shoot key - change as desired
                 tank1.shoot()
-                update_scores(tank1,tank2)
+                if gamemode == '2':
+                    update_scores(tank1,tank2)
+                if gamemode == '1':
+                    update_scores(tank2,tank2)
+
 #---------------------tank 2 stuff----------------------------------#
-            if(key == 'd'):
-                tank2.turn(turn_angle = -2)
-            elif(key == 's'): # shift down one gear
-                tank2.brake()
-            elif(key == 'a'):
-                tank2.turn(turn_angle = +2)
-            elif(key == 'w'):  # shift up one gear
-                tank2.speed_up()
-            elif(key == 'tab'): # shoot key - change as desired
-                tank2.shoot()
-                update_scores(tank1,tank2)
+            if gamemode == '2':
+                if(key == 'd'):
+                    tank2.turn(turn_angle = -2)
+                elif(key == 's'): # shift down one gear
+                    tank2.brake()
+                elif(key == 'a'):
+                    tank2.turn(turn_angle = +2)
+                elif(key == 'w'):  # shift up one gear
+                    tank2.speed_up()
+                elif(key == 'tab'): # shoot key - change as desired
+                    tank2.shoot()
+                    update_scores(tank1,tank2)
 
           #************** put in logic for second tank keys *****************          
 
-    # check for end of game
-    if (tank1.lives < 1) | (tank2.lives < 1): # see if either one is dead
-        # check for tank 1 win
-        if (tank2.lives < 1):
-            write_text(text= 'YELLOW TANK WINS',
-                       topleft=(250,250),font_size=90,color=YELLOW)
-        elif (tank1.lives < 1):
-            write_text(text= 'RED TANK WINS',
-                       topleft=(250,250),font_size=90,color=RED)
+# check for end of game
+    if gamemode == '2':
+        if (tank1.lives < 1) | (tank2.lives < 1): # see if either one is dead
+            #check for tank 1 win
+            if (tank2.lives < 1):
+                write_text(text= 'YELLOW TANK WINS',
+                           topleft=(250,250),font_size=90,color=YELLOW)
+            elif (tank1.lives < 1):
+                write_text(text= 'RED TANK WINS',
+                           topleft=(250,250),font_size=90,color=RED)
 
-        
+            
         time.sleep(5) # display winning message for 5 seconds
         pygame.quit()
         sys.exit()
