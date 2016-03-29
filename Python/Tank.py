@@ -363,6 +363,12 @@ class Robot_Tank(Tank):
 
         # if target in range of our short gun, shoot and unlock from him
         if abs(distancetotarget) < self.max_range:
+            cone = random.random() * 50
+            if cone > 25:
+                cone -= 25
+            if cone < 25:
+                cone = cone * -1
+            self.turn(turn_angle = cone)
             self.shoot(max_range = self.max_range)
             self.target = None
 
@@ -614,10 +620,11 @@ def update_scores(tank1,tank2):
 pygame.key.set_repeat(500,50) # 500 msec 'til repeat then 20 times a second
 #pygame.key.set_repeat(0,0) 
 # Create the tanks
+tank1_home = ( WINDOWWIDTH-100,int(WINDOWHEIGHT/2))
 if gamemode == '2':
-    tank1_home = ( WINDOWWIDTH-100,int(WINDOWHEIGHT/2))
     tank1 = Tank(direction=90,speed=0,color=YELLOW,
                  center=tank1_home,lives=5,ammo=60 )
+
 tank2_home = (100,int(WINDOWHEIGHT/2))
 tank2 = Tank(direction=90,speed=0,color=RED,
              center =tank2_home,lives=5,ammo=60)
@@ -659,37 +666,36 @@ while True:
         if event.type is KEYDOWN:
 
             key = pygame.key.name(event.key)
+            if gamemode == '2':    
+                if(key == 'right'):
+                    tank1.turn(turn_angle = -2)
+                elif(key == 'down'): # shift down one gear
+                    tank1.brake()
+                elif(key == 'left'):
+                    tank1.turn(turn_angle = +2)
+                elif(key == 'up'):  # shift up one gear
+                    tank1.speed_up()
+                elif(key == 'right ctrl'): # shoot key - change as desired
+                    tank1.shoot()
+                    update_scores(tank1,tank2)
 
-            if(key == 'right'):
-                tank1.turn(turn_angle = -2)
-            elif(key == 'down'): # shift down one gear
-                tank1.brake()
-            elif(key == 'left'):
-                tank1.turn(turn_angle = +2)
-            elif(key == 'up'):  # shift up one gear
-                tank1.speed_up()
-            elif(key == 'right ctrl'): # shoot key - change as desired
-                tank1.shoot()
+
+#---------------------tank 2 stuff----------------------------------#
+            if(key == 'd'):
+                tank2.turn(turn_angle = -2)
+            elif(key == 's'): # shift down one gear
+                tank2.brake()
+            elif(key == 'a'):
+                tank2.turn(turn_angle = +2)
+            elif(key == 'w'):  # shift up one gear
+                tank2.speed_up()
+            elif(key == 'tab'): # shoot key - change as desired
+                tank2.shoot()
                 if gamemode == '2':
                     update_scores(tank1,tank2)
                 if gamemode == '1':
                     update_scores(tank2,tank2)
-
-#---------------------tank 2 stuff----------------------------------#
-            if gamemode == '2':
-                if(key == 'd'):
-                    tank2.turn(turn_angle = -2)
-                elif(key == 's'): # shift down one gear
-                    tank2.brake()
-                elif(key == 'a'):
-                    tank2.turn(turn_angle = +2)
-                elif(key == 'w'):  # shift up one gear
-                    tank2.speed_up()
-                elif(key == 'tab'): # shoot key - change as desired
-                    tank2.shoot()
-                    update_scores(tank1,tank2)
-
-          #************** put in logic for second tank keys *****************          
+          #************** put in logic for second tank keys *****************#
 
 # check for end of game
     if gamemode == '2':
