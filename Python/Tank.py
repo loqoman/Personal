@@ -30,8 +30,9 @@ WINDOWWIDTH = 1250
 WINDOWHEIGHT = 750
 
 NUMBERMINES = 5     # NUMBER OF MINES TO SPRINKLE AROUND
-NUMBERROBOTS = 50     # NUMBER OF ROBOT TANKS TO SPRINKLE AROUND
+NUMBERROBOTS = int((input('How many bots do you want?\n')))  # NUMBER OF ROBOT TANKS TO SPRINKLE AROUND
 BULLETSPEED = 10     # SPEED OF THE BULLET IN PIXELS PER UPDATE
+BOTCONE = 50
 
 windowSurface = pygame.display.set_mode([WINDOWWIDTH, WINDOWHEIGHT])
 pygame.display.set_caption('Tanks')
@@ -363,10 +364,10 @@ class Robot_Tank(Tank):
 
         # if target in range of our short gun, shoot and unlock from him
         if abs(distancetotarget) < self.max_range:
-            cone = random.random() * 50
-            if cone > 25:
-                cone -= 25
-            if cone < 25:
+            cone = random.random() * BOTCONE
+            if cone > BOTCONE/2:
+                cone -= BOTCONE/2
+            if cone < BOTCONE/2:
                 cone = cone * -1
             self.turn(turn_angle = cone)
             self.shoot(max_range = self.max_range)
