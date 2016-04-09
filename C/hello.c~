@@ -1,0 +1,19 @@
+#include <stdio.h>
+// function declaration
+long func();
+long foo;
+//---//
+int main() {
+
+   // function call
+   foo = 123123123123123123123;
+   long i = func();
+   printf("%ld %ld \n",i,i);
+}
+
+// function definition
+long func() {
+   	   
+   return foo;
+}
+
