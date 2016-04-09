@@ -2,13 +2,16 @@
 // function declaration
 long func();
 long foo;
+long l;
 //---//
 int main() {
 
    // function call
    foo = 123123123123123123123;
    long i = func();
-   printf("%ld %ld \n",i,i);
+   long l = sizeof(long)
+   printf("%ld %ld \n",i,i);\
+   printf("%ld", l)
 }
 
 // function definition
