@@ -28,24 +28,33 @@ BACKGROUND = (0,0,0)
 
 WINDOWWIDTH = 1250
 WINDOWHEIGHT = 750
-
+#Begginiing print messages
+print("Uhhh...hi so this is my tank program")
+print("The goal is to destroy all the green bot tanks")
+print("WASD is their corrosponding arrows and TAB to shoot")
+print("Also because of the way I have it set up right now You can only press 1 key at a time")
+print("if you want to go ahead and leave a comment on the text pad file.")
+print("It's on the command bar at the bottom")
 NUMBERMINES = 5     # NUMBER OF MINES TO SPRINKLE AROUND
 NUMBERROBOTS = int((input('How many bots do you want?\n')))  # NUMBER OF ROBOT TANKS TO SPRINKLE AROUND
 BULLETSPEED = 10     # SPEED OF THE BULLET IN PIXELS PER UPDATE
 BOTCONE = 50
-
+#Some varibles that i dont have the intellegence to make globals
+robotank = []
+#GETTING NUMBER OF PLAYERS
+print('What gamemode is this?(Note, currently only singleplayer is supported :p)')
+gamemode = input('1 for single and 2 for 2 player\n')
+#SETTING UP WINDOW
 windowSurface = pygame.display.set_mode([WINDOWWIDTH, WINDOWHEIGHT])
 pygame.display.set_caption('Tanks')
 
-print('What gamemode is this?(Note, currently only singleplayer is supported :p)')
-gamemode = input('1 for single and 2 for 2 player\n')
+
 #-------------------- Tank Class ver 0.2------------------------------------------
 class Tank(object):
 # Tank class to define a battle tank. Turret direction indicates move and shoot
 # direction for now:
 
     tanks = []  # list of all tank objects
-
     def move_all():
     # Tank class method to move all the active tanks
         for tank in Tank.tanks:
@@ -70,7 +79,6 @@ class Tank(object):
 
         # add this tank to the list of tanks
         Tank.tanks.append(self)
-
 
         # dx and dy are the distance accumulators for the distance not moved
         # by the integer pixel count
@@ -282,7 +290,6 @@ class Tank(object):
 #---------------------Robot Tank Class ver 0.2--------------------------------------
 # Inherited class of Tank for robot tanks
 class Robot_Tank(Tank):
-
     def  __init__(self,center=(500,500),color=GREEN,size=25,
                   lives=1,ammo=10,speed=1,max_range=WINDOWWIDTH/10):
 
@@ -296,14 +303,14 @@ class Robot_Tank(Tank):
         self.ammo = ammo    # number of rounds we can fire in each life
         self.speed = speed
         self.max_range = max_range
-
+        
         self.target = None  # initially not locked, otherwise hold target tank
     
         self.home = center  # remember center as the home base
 
         # add this tank to the list of tanks
         Tank.tanks.append(self)
-
+        robotank.append(self)
 
         # dx and dy are the distance accumulators for the distance not moved
         # by the integer pixel count
@@ -657,7 +664,7 @@ Mine.flash_all(period=0,flashtime=5) # give folks a peek to start with
 #  Main game loop, runs until window x'd out or someone wins
 if gamemode == '2':
     update_scores(tank2,tank2)   # put up initial scores
-
+	
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
