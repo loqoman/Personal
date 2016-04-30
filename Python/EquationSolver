@@ -1,0 +1,29 @@
+import math, decimal
+from decimal import *
+
+target = 'x'
+operations = ['+','-','*','/']
+
+equation = input('equation')
+Other_Equation = input('whats the other side of the equation')
+
+#Splitting up the equtation into multiple items, maby a list
+# I dont know.
+
+equation.split()
+
+print(equation)
+
+#for i in operations:
+
+print[equation.index('+')]
+
+'''
+temp = []
+for i in equation:
+	if i = '+':
+		temp.append[equation.index(i)]
+'''
+#want to take note here that it breaks down the equation by character
+
+
