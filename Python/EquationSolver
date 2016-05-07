@@ -4,26 +4,35 @@ from decimal import *
 target = 'x'
 operations = ['+','-','*','/']
 
-equation = input('equation')
-Other_Equation = input('whats the other side of the equation')
+print('Hello and welcome to the quadratic forumla calcuator!')
+print('Made by Darwin Clark')
+
+A = input('What is A?')
+B = input('What is B?')
+C = input('What is C?')
+
 
 #Splitting up the equtation into multiple items, maby a list
-# I dont know.
+#I dont know.
+#----#
+'''
+Important
+Froumla for a quadric equation is:
 
-equation.split()
+X = ([b*-1]*Math.sqrt[(Math.pow[b,2]) - 4*A*C)/A*2
 
-print(equation)
+'''
+#----#
+#equation.split()
+print('Calcuating value of X...')
+X = B*-1*math.sqrt(math.pow(B,2) - 4*A*C/A*2)
+print(X)
+#print(equation)
 
 #for i in operations:
 
-print[equation.index('+')]
+#print[equation.index('+')]
 
-'''
-temp = []
-for i in equation:
-	if i = '+':
-		temp.append[equation.index(i)]
-'''
 #want to take note here that it breaks down the equation by character
 
 
