@@ -1,0 +1,11 @@
+//---Pins-------------------------------------------------------------------------------\\
+
+	1-Gnd
+	2-3.3V
+	3-[CE]DPin 7		//Both 7 and 8 pins are digital
+	4-[CSN]DPin 8		//These pins are also defined by the init of the radio
+				//RF24 radio(7,8);//
+	5-[SCK]DPin 13		//Ping 13, 11, and 12 are all digital pins
+	6-[MOSI]DPin 11
+	7-[MISO]DPin 12
+	8-Dont use
