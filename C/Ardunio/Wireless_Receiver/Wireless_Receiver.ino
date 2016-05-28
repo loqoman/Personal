@@ -25,7 +25,7 @@ RF24 radio(7,8);
 byte addresses[][6] = {"1Node","2Node"};
 
 // Used to control whether this node is sending or receiving
-bool role = 1;// 1 is talker, 0 is reciever
+bool role = 0;// 1 is talker, 0 is reciever
 
 void setup() {
   Serial.begin(115200);
@@ -108,7 +108,7 @@ if (role == 1)  { //HEHE! IM THE TALKER!!!
   if ( role == 0 )
   {
     unsigned long got_time;
-    
+    Serial.print(F("Receiver - begin listening"));
     if( radio.available()){
                                                                     // Variable for the received timestamp
       while (radio.available()) {                                   // While there is data ready
