@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Oval.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;JavaIntro_-_Shapes&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">edu.pcwe.uw.javaintro.shapes</a> &gt; <span class="el_source">Oval.java</span></div><h1>Oval.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.pcwe.uw.javaintro.shapes;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+
+/**
+ * Encapsulates an oval shape. The shape is defined by a bounding rectangle;
+ * the origin is the upper-left hand corner of the rectangle.
+ * &lt;p&gt;
+ * &lt;img src=&quot;{@docRoot}/doc-files/oval.png&quot; alt = &quot;(oval picture)&quot;&gt;
+ * &lt;/p&gt;
+ * 
+ * @author jack
+ */
+public class Oval extends Rectangle
+{
+
+    /**
+     * Default constructor. The origin, fill color and edge color are set
+     * to null; the width and height of the bounding rectangle will be 0.
+     */
+    public Oval()
+    {
+<span class="fc" id="L30">        this( null, null, null, 0, 0 );</span>
+<span class="fc" id="L31">    }</span>
+        
+    /**
+     * Sets the origin, width and height of the oval to the given values.
+     * The fill and edge colors are set to null.
+     * 
+     * @param origin    The given origin.
+     * @param width     The given width
+     * @param height    The given height.
+     */
+    public Oval( DPoint origin, double width, double height )
+    {
+<span class="fc" id="L43">        this( origin, null, null, width, height );</span>
+<span class="fc" id="L44">    }</span>
+
+    /**
+     * Defines an oval shape based on the given parameters.
+     * 
+     * @param origin    The given origin.
+     * @param fillColor The given fill color.
+     * @param edgeColor The given edge color.
+     * @param width     The given width.
+     * @param height    The given height.
+     */
+    public Oval(
+        DPoint origin,
+        Color fillColor,
+        Color edgeColor, 
+        double width, 
+        double height 
+    )
+    {
+<span class="fc" id="L63">        super( origin, fillColor, edgeColor, width, height );</span>
+<span class="fc" id="L64">    }</span>
+    
+    /**
+     * Draws this oval.
+     * 
+     * @param gtx The graphics context to control the drawing.
+     */
+    public void draw( Graphics2D gtx )
+    {
+<span class="fc" id="L73">        Color   save    = gtx.getColor();</span>
+<span class="fc" id="L74">        Color   fill    = getFillColor();</span>
+<span class="fc" id="L75">        Color   edge    = getEdgeColor();</span>
+<span class="fc" id="L76">        Point   orig    = getOrigin().getPoint();</span>
+<span class="fc" id="L77">        int     width   = getIntWidth();</span>
+<span class="fc" id="L78">        int     height  = getIntHeight();</span>
+        
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        if ( fill != null )</span>
+        {
+<span class="fc" id="L82">            gtx.setColor( fill );</span>
+<span class="fc" id="L83">            gtx.fillOval( orig.x, orig.y, width, height );</span>
+        }
+        
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if ( edge != null )</span>
+        {
+<span class="fc" id="L88">            gtx.setColor( edge );</span>
+<span class="fc" id="L89">            gtx.drawOval( orig.x, orig.y, width, height );</span>
+        }
+        
+<span class="fc" id="L92">        gtx.setColor( save );</span>
+<span class="fc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
