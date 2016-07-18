@@ -1,0 +1,197 @@
+'''
+This is a UI class that is used to create arrays of buttons,
+instead of just a singular one.
+(Commonly called a 'radio' button)
+
+Making a singular button can be done with the rectangle(Widget)
+class and also, in my opinion looks sleeker.
+
+Buttons in this class look like this:
+ _
+|_| Text. 
+
+There is a circle inside the square.
+[It is worth noting that this class does not need the Text(Wiget)]
+[class to function]
+ 
+#
+# Currently in version 1.0
+#
+'''
+class Button(Widget):
+
+    buttonlist = []
+    grouplist = {}
+    
+    def __init__ (self, window = windowSurface,color = BLACK,
+                  topleft = (200,200), size=20,name = '', label='',
+                  value = '',app_handler=Widget.handler,
+                  group = '',groupaction = 'RADIO'):   
+
+        self.window = window
+        self.color = color
+        self.topleft = topleft
+        self.left = topleft[0]  # required by isclicked method in Widget
+        self.top = topleft[1]   # "
+        self.width = size       # "
+        self.height = size      # "
+        self.right = self.left + size
+        self.bottom = self.top + size
+        self.size = size
+        self.name = name
+        self.label = label
+        self.value = value
+        self.app_handler = app_handler # object of applications specific handler
+        self.group = group
+        
+        self.groupaction = groupaction
+        # groupaction value of 'RADIO' allows only one in group to be on
+        # 'RADIO_WITH_OFF' allows only one but all off also
+        # '' means no group action required
+
+        self.state = False    # Initialize button state to 'off'
+
+
+        # Add widget object keyed by name to widget dictionary.
+        # Non-null Widget names must be unique.
+        
+        if ( (name != '') and (name not in Widget.widgetlist) ):
+            Widget.widgetlist[name] = (self,app_handler)
+        else:
+            print ('Error - duplicate widget name of ' + name)
+
+        Button.buttonlist += [self] # add to button list as a object
+
+        # if button is in a group, add group to dictionary if the group is not
+        # already there.  Then add the button to the group.
+
+        if group in Button.grouplist:
+            Button.grouplist[group] += (self,)
+        else:
+            Button.grouplist[group] = (self,)
+
+
+        
+        # get the rectangle for the object
+        self.rect = pygame.draw.rect(window,color,
+        (topleft[0],topleft[1],size,size),1)
+
+        #write label if any
+        if label != '':
+           self._label()
+            
+        self.draw()
+
+    def _label(self): # private method to generate label, does not do draw
+       labelFont = pygame.font.SysFont(None, int(self.size*1.5) )
+       text = labelFont.render(self.label,True,self.color,
+       Widget.background_color)
+       
+       textRect= text.get_rect()
+       textRect.left = self.rect.right + 5
+       textRect.bottom = self.rect.bottom
+       self.window.blit(text, textRect)
+                                                   
+
+    def identify(self):  # print my name
+        print ("Button name is:" + self.name)
+
+    def draw (self): # draw button with current state
+        
+        self.rect = pygame.draw.rect(self.window, self.color,
+        self.rect,1)
+
+        if self.state:
+
+            pygame.draw.circle(self.window,self.color,
+            (self.rect.left+int(self.size/2),self.rect.top+int(self.size/2))
+            ,int(self.size/2)-2,0)
+        else:
+            pygame.draw.circle(self.window,WHITE,
+            (self.rect.left+int(self.size/2),self.rect.top+int(self.size/2)),
+            int(self.size/2)-2,0)
+            
+            pygame.draw.circle(self.window,self.color,
+            (self.rect.left+int(self.size/2),self.rect.top+int(self.size/2)),
+            int(self.size/2)-2,1)
+                               
+        pygame.display.update()   # refresh the screen
+
+    def toggle (self):  # toggle the button state
+        if self.state:
+            self.state = False
+        else:
+            self.state = True
+            
+        self.draw()
+
+
+
+    def group_handler(self):
+    # if button in a group, button is now on and is a RADIO button  then
+    # turn off all other buttons in the group
+
+        #if groupaction is 'RADIO' or 'RADIO_WITH_OFF'and new state is on,
+        # turn off all other buttons in the group. 
+        if ( (self.groupaction == 'RADIO') |
+             (self.groupaction == 'RADIO_WITH_OFF') ):
+
+            # loop finding other buttons in group and turning them off
+            for i in range(len((Button.buttonlist))):
+
+                if (Button.buttonlist[i].group == self.group and
+                Button.buttonlist[i] != self):
+                    Button.buttonlist[i].state = False
+                    Button.draw(Button.buttonlist[i])
+
+        # Now, if 'RADIO' and if new state is off,
+        # tun it back on because at least one must be on in the group.
+        if self.groupaction == 'RADIO':
+            if (self.state == False):
+                self.toggle()
+                return
+#------------------------------------------------------------
+# Button handler method,  overriding the Widget
+# handler method prototype. Does some general work then calls the
+# group handler and application specific handler if any
+#------------------------------------------------------------
+
+    def handler(self):
+
+
+        # toggle the state of the button
+        self.toggle()
+
+        # see if button is in a group and if so, call  the group handler
+        # in button class to enforce such things as 'RADIO' exclusivity
+        if self.group != '': #if it does not have a group
+            self.group_handler()
+
+        # call the application specific handler (if none specified when
+        # button is created it defaults to dummy prototype Widget.handler).
+        self.app_handler(self)
+
+
+        return
+            
+#--------------------------------------------------------------
+# Following is some examples of buttons 
+# and their handlers
+# as well as how to assign them
+#--------------------------------------------------------------
+#Initilazing the button
+go = Button(name='Go',color = RED,topleft=(10,10),size = 35, #Big GO button at the top
+                label='Go',app_handler=go_application_handler)
+                
+#The handler that will run when the button is clicked
+def new_maze_handler(self):
+    print(difficulty)
+    maze.build(difficulty=difficulty)
+    
+    
+    rat.draw()
+    
+    store_cheese(GAME_CHEESE)
+
+    new.toggle()
+

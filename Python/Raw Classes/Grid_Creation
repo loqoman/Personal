@@ -1,0 +1,281 @@
+
+class Maze(object):
+#
+
+
+
+    def __init__(self):
+    # Maze initialization method called when maze is created
+
+        
+        return  # return from Maze.__init__
+        		# dosent return anything
+
+    def build(self,difficulty = 'M'):
+    # Maze.build function called at the Maze object level to build a maze.
+        if difficulty == 'E':
+            temp_rooms = int(ROOMS_V / 2)
+        elif difficulty == 'M':
+            temp_rooms = int(ROOMS_V)
+        elif difficulty == 'H':
+            temp_rooms = int(ROOMS_V * 2)
+        elif difficulty == 'H+':
+            temp_rooms = int(ROOMS_V * 4)
+
+        # Fill in the rooms array with the room objects
+        for h in range (0,int(temp_rooms * (float(MAZE_WIDTH)/float(MAZE_HEIGHT)))):
+            Room.rooms.append([])  # this creates the second dimension
+            for v in range(0,temp_rooms):
+                room = Room(size=int(float(MAZE_HEIGHT)/float(temp_rooms)),row=v,col=h)
+                Room.rooms[h].append(room)
+                Room.unused_rooms.append(room)
+        
+        # generator doesn't mark the starting room because it is used for branches
+        # so mark the starting room as solid white
+
+
+
+        while True:
+            room = Room.rooms[STARTING_COL][STARTING_ROW]
+            room.room_color = WHITE
+            room.state = 'P'
+            Room.draw(room)
+
+            # Do a random walk for primary path
+            p_path = Path() # create an object for the primary path
+            east_exit = p_path.random_walk(col=STARTING_COL,row=STARTING_ROW,
+                                    color=RED,room_state='P',seek_east=True)
+            if east_exit:
+                break
+            else:
+                Maze.reset(maze) # reset the array and try again
+
+        room = Room.rooms[STARTING_COL][STARTING_ROW]
+        Room.unused_rooms.remove(room)
+        p_path.rooms.insert(0,room)  # add starting room to head of rooms list
+
+        Path.primary_path.append(p_path) # append the path object, only one
+
+        # Now build some secondary paths
+        for i in range(0,int(len(p_path.rooms)/5)):
+            room_index = random.randrange(0,len(p_path.rooms))
+            room = p_path.rooms[room_index]
+            col = room.col
+            row = room.row
+            s_path = Path()  # create a new secondary path object
+            unused = s_path.random_walk(col,row,color=YELLOW,
+                                         room_state='S')
+            if len(s_path.rooms) > 0: # don't store empty path
+                Path.level2_paths.append(s_path)
+            
+        # Also build some Tertiary paths]
+        if len(Path.level2_paths) >0:  # make sure there are paths at level 2
+            for i in range(0,len(Path.level2_paths)): # for all paths in level2
+                
+                if len(Path.level2_paths[i].rooms) > 0: # insure some rooms
+                    for j in range(0,int(len(Path.level2_paths[i].rooms))):
+                        room_index = random.randrange(0,
+                                            len(Path.level2_paths[i].rooms))
+                        room = Path.level2_paths[i].rooms[room_index]
+                        col =room.col
+                        row =room.row
+                        t_path = Path()   # ceate a new path object
+                        unused= t_path.random_walk(col,row,color=GREEN,
+                                                 room_state='T')
+                        if len(t_path.rooms) > 0: # don't store empty path
+                            Path.level3_paths.append(t_path)
+        # And finally some level4 paths
+        if len(Path.level3_paths) >0:  # make sure there are paths at level 3
+            for i in range(0,len(Path.level3_paths)): # for all paths in level 3
+                if len(Path.level3_paths[i].rooms) > 0: # ensure some rooms
+                    for j in range(0,int(len(Path.level3_paths[i].rooms))):
+                        room_index = random.randrange(0,
+                                            len(Path.level3_paths[i].rooms))
+                        room = Path.level3_paths[i].rooms[room_index]
+                        col =room.col
+                        row =room.row
+                        f_path = Path()  # create a new path object
+                        unused= f_path.random_walk(col,row,
+                                                color=AQUAMARINE,
+                                                 room_state='F')
+                        if len(f_path.rooms) > 0: # don't store empty path
+                            Path.level4_paths.append(f_path) 
+           
+        # For debug, turn all the unused rooms to a light color
+
+        for i in range(0,len(Room.unused_rooms)):
+            room = Room.unused_rooms[i]
+            room.room_color = LIGHTGREY
+            Room.draw(room)
+
+        # clean up the unused cells
+
+        while len(Room.unused_rooms) > 0:
+            # select an unused room to start a dead end path
+            room = random.choice(Room.unused_rooms)
+        #    print('calling dead_end',room.col,room.row)
+        #    print('length of unused rooms is',len(Room.unused_rooms))
+#            d_path = Path()
+            d_path = Path()    # build a new path object
+            status = d_path.build_dead_end(room.col,room.row,
+                                            color=SALMON,room_state='D')
+            if status:
+                Path.dead_end_paths.append(d_path)
+            
+        time.sleep(5)
+
+        # Show maze in light color
+        for col in range(0,ROOMS_H):
+            for row in range(0,ROOMS_V):
+                room = Room.rooms[col][row]
+                room.room_color = LIGHTGREY
+                room.draw()
+
+        # Redraw the starting room in white
+        room = Room.rooms[STARTING_COL][STARTING_ROW]
+        room.room_color = WHITE
+        room.draw()
+        pygame.display.update()
+        
+        # return from Maze.build
+        return  
+
+    def reset(self):
+    # Maze method to reset the room array to initial condition
+        Room.unused_rooms = []  # empty the unused rooms list
+        for col in range (0,ROOMS_H):
+            for row in range(0,ROOMS_V):
+                room = Room.rooms[col][row]
+                Room.unused_rooms.append(room)
+                room.room_color = BACKGROUND
+                room.state = None;
+                room.contents = []  # reset to no contents
+                #initialize the state of the walls, True means they are up
+                room.n_wall = True
+                room.s_wall = True
+                room.e_wall = True
+                room.w_wall = True
+                room.draw()
+
+        return # return from Maze.reset
+
+#Class that is used to determine the size of the grid
+class Room(object):
+    
+    rooms = []  # holds the doubly indexed list of room objects
+    unused_rooms = [] # single indexed list of the unused rooms
+    
+    def __init__(self,size=20,row=0,col=0):
+    #Room initialization method called when room is created.  Column and row
+    # give the position in the array
+        self.room_color = BACKGROUND  # chose the paint colors
+        self.wall_color = BLACK
+        self.size = size  # size of the room in pixels
+        print(self.size)
+        self.col = col    # column coordinate
+        self.row = row   # row coordinate
+        self.state = None   # usage state of the room
+        self.contents = [] # contents list to empty
+
+        #initialize the state of the walls, True means they are up
+        self.n_wall = True
+        self.s_wall = True
+        self.e_wall = True
+        self.w_wall = True
+
+        #define a rectangle for this room and save it
+        left = int(float((WINDOWWIDTH-MAZE_WIDTH)/2.)
+                   +int(self.col*float(size)))
+        top =  int(float((WINDOWHEIGHT-MAZE_HEIGHT)/2)
+                   +int(self.row*float(size)))
+        self.rect = pygame.Rect(left,top,size,size)
+
+        self.draw()  # draw the room
+
+        return  # return from Room.__init__
+
+    def draw(self):
+    # Room method to draw and room and it's walls acording to current wall state
+
+        pygame.draw.rect(windowSurface,self.room_color,self.rect,0) # draw the floor
+
+        #draw the walls based on their state
+        if self.n_wall:
+            pygame.draw.line(windowSurface,self.wall_color,
+                             (self.rect.left,self.rect.top),
+                             (self.rect.left+self.size,self.rect.top),1)
+        if self.s_wall:
+           pygame.draw.line(windowSurface,self.wall_color,
+                             (self.rect.left,self.rect.bottom),
+                             (self.rect.left+self.size,self.rect.bottom),1)
+        if self.w_wall:
+           pygame.draw.line(windowSurface,self.wall_color,
+                 (self.rect.left,self.rect.top),
+                 (self.rect.left,self.rect.top+self.size),1)
+        if self.e_wall:
+           pygame.draw.line(windowSurface,self.wall_color,
+                             (self.rect.right,self.rect.top),
+                             (self.rect.right,self.rect.top+self.size),1)
+        
+
+        pygame.display.update()
+
+        return  # return from Maze.draw
+
+    def walk(self,direction='N',wall_check=True):
+    #Maze method to walk out of a room
+    # if walk_check is False, you can walk through walls (used for initial
+    # maze setup). Returns false if we can't go that way, also returns updated
+    # room object.
+    
+        moved = False  # establish default
+        col = self.col # initial col
+        row = self.row
+        if ( (direction == 'N') &
+             (self.row >0) ):
+            if( (not self.n_wall) |  (not wall_check)):
+                 row -=1
+                 moved = True
+        if ( (direction == 'S') &
+             (self.row < (ROOMS_V-1) ) ):
+            if( (not self.s_wall) |  (not wall_check)):
+                 row +=1
+                 moved = True
+        if ( (direction == 'W') &
+             (self.col >0) ):
+            if( (not self.w_wall) |  (not wall_check)):
+                 col -=1
+                 moved = True
+        if ( (direction == 'E') &
+             (self.col < (ROOMS_H-1) ) ):
+            if( (not self.e_wall) |  (not wall_check)):
+                 col +=1
+                 moved = True
+#        print('dir,N,S,E,W= ',direction,self.n_wall,self.s_wall,
+#              self.e_wall,self.w_wall)
+
+        return moved,col,row  # returned with indication of success or failure
+
+    def knock_out_walls(direction,room,old_room):
+    # General purpose function to clear the walls from which we entered a room.
+    # direction is the direction we were going when we entered.
+    # room is current room object. old_room is the room we entered from.
+ 
+
+        if direction == 'N':
+            old_room.n_wall = False
+            room.s_wall = False
+        elif direction == 'S':
+            old_room.s_wall = False
+            room.n_wall = False
+        elif direction == 'E':
+            old_room.e_wall = False
+            room.w_wall = False
+        elif direction == 'W':
+            old_room.w_wall = False
+            room.e_wall = False
+        Room.draw(old_room) # redraw both rooms
+        Room.draw(room)
+
+        return # return from knock_out_walls
+

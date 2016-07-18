@@ -1,14 +1,19 @@
-#--------#
-'''
-Tanks - beta version by Darwin I and Darwin II
+''' Tanks - beta version by Darwin I and Darwin II
     ver 0.1 intitial beta
     ver 0.2 add robot tanks
-    ver 0.3 Singleplayer Support
+    ver 0.3 make space a shoot key
+    ver 1.0 Added all competition capibilities
+	-On each side there are a given amount of bot tanks and 1 'Master' tank
+		~The robot tanks have less range than the command tank
+		~The Master tank has longer range than the robot tanks
+    ver 1.1 Change robot tank inits to use parent Tank class init
+    ver 2.0 Require all tanks to be killed to win game
+ 
+Programmer Changelog
+Loqoman - 6/6/2016 9:16PM - Began this changelog and removed out mine blip 
+IslandSparky - 6/15/2016 4PM - Commit version 1.1 above
+IslandSparky - 6/24/2016 10 AM - Commit version 2.0 above'''
 
-
-
-'''
-#--------#
 import pygame, sys, time, random,math
 from pygame.locals import *
 
@@ -28,57 +33,60 @@ BACKGROUND = (0,0,0)
 
 WINDOWWIDTH = 1250
 WINDOWHEIGHT = 750
-#Begginiing print messages
-print("Uhhh...hi so this is my tank program")
-print("The goal is to destroy all the green bot tanks")
-print("WASD is their corrosponding arrows and TAB to shoot")
-print("Also because of the way I have it set up right now You can only press 1 key at a time")
-print("if you want to go ahead and leave a comment on the text pad file.")
-print("It's on the command bar at the bottom")
-NUMBERMINES = 5     # NUMBER OF MINES TO SPRINKLE AROUND
-NUMBERROBOTS = int((input('How many bots do you want?\n')))  # NUMBER OF ROBOT TANKS TO SPRINKLE AROUND
-BULLETSPEED = 10     # SPEED OF THE BULLET IN PIXELS PER UPDATE
-BOTCONE = 50
-#Some varibles that i dont have the intellegence to make globals
-robotank = []
-#GETTING NUMBER OF PLAYERS
-print('What gamemode is this?(Note, currently only singleplayer is supported :p)')
-gamemode = input('1 for single and 2 for 2 player\n')
-#SETTING UP WINDOW
+
+NUMBERMINES = 0     # NUMBER OF MINES TO SPRINKLE AROUND
+NUMBERREDROBOTS = 10 # NUMBER OF RED ROBOT TANKS 
+NUMBERYELLOWROBOTS = 10 # NUMBER OF YELLOW ROBOT TANKS
+NUMBERBARRIERS = 10   # NUMBER OF BARRIERS
+
+MAXSPEED = 3        # MAXIMUM SPEED A TANK CAN GO
+SLEWANGLE = 2       # AMOUNT OF ANGLE ROBOT CAN SLEW PER MOVE
+BULLETSPEED = 10    # SPEED OF THE BULLET IN PIXELS PER UPDATE
+
+GAMEDELAY = .10     # INITIAL GAME DELAY LOOP IN SECONDS
+
 windowSurface = pygame.display.set_mode([WINDOWWIDTH, WINDOWHEIGHT])
 pygame.display.set_caption('Tanks')
-
 
 #-------------------- Tank Class ver 0.2------------------------------------------
 class Tank(object):
 # Tank class to define a battle tank. Turret direction indicates move and shoot
 # direction for now:
 
-    tanks = []  # list of all tank objects
+    tanks = []              # list of all tank objects
+    red_tanks = []          # List of all red  tanks
+    yellow_tanks = []       # List of all yellow tanks
+
     def move_all():
     # Tank class method to move all the active tanks
         for tank in Tank.tanks:
             tank.move()
 
         return # return from Tank.move_all
+    def  __init__(self,center=(500,500),color=YELLOW,size=25,direction=180,
+                  lives=1,ammo=10,speed=1,max_range=WINDOWWIDTH/4,army=RED,
+                  tank_type='Master'):
 
-    def  __init__(self,center=(500,500),color=YELLOW,size=25,direction = 90,
-                  lives=5,ammo=25,speed=0):
 
     # This is the initializer called each time you create a new tank.
     # The size is specified as a single variable because the tank is drawn
     # in a square.
+        self.home = center  # remember center as the home base
         self.color = color
         self.size = size
         self.direction = direction # direction the tank (and gun) is pointed
         self.lives = lives  # number of lives we have
         self.ammo = ammo    # number of rounds we can fire in each life
-
         self.speed = speed
-        self.home = center  # remember center as the home base
+        self.max_range = max_range  # range of cannon
+        self.army = army    # army he belongs to
 
-        # add this tank to the list of tanks
+        # add this tank to the list of all tanks and to proper army list
         Tank.tanks.append(self)
+        if self.army == RED:
+            Tank.red_tanks.append(self)
+        elif self.army == YELLOW:
+            Tank.yellow_tanks.append(self)
 
         # dx and dy are the distance accumulators for the distance not moved
         # by the integer pixel count
@@ -106,8 +114,8 @@ class Tank(object):
         # draw the gun. Starts in center but must compute the endpoint
 
         gunlength = self.size/2-1
-        dx = math.cos(self.direction/57.4) * gunlength  # x increment
-        dy = -math.sin(self.direction/57.4) * gunlength  # y increment
+        dx = math.cos(self.direction/57.3) * gunlength  # x increment
+        dy = -math.sin(self.direction/57.3) * gunlength  # y increment
         gunend = (self.rect.center[0]+dx, self.rect.center[1]+dy)
         pygame.draw.line(windowSurface,self.color,self.rect.center,
                          gunend,2)
@@ -132,10 +140,11 @@ class Tank(object):
         self.rect.center = (self.rect.center[0]+int(self.dx),
                             self.rect.center[1]+int(self.dy))
 
-        # if we hit a wall or a barrier, reverse out the move
+        # if we hit a wall,other tank or a barrier, reverse out the move
 
         if ( (check_wall(self.rect) != None) |
-              check_barrier(self.rect) ):
+             check_tank(self.rect)  |
+             check_barrier(self.rect) ):
             stuck = True
             self.rect.center = (self.rect.center[0]-int(self.dx),
                                 self.rect.center[1]-int(self.dy))
@@ -164,8 +173,6 @@ class Tank(object):
 
     def speed_up(self):
     # Tank method to increase the speed. Can't go more than MAXSPEED
-
-        MAXSPEED = 3
 
         
         if self.speed < MAXSPEED:
@@ -274,7 +281,7 @@ class Tank(object):
                 if rect.colliderect(barrier):
                     explode(rect.center,color,radius=20)
                     clean_track(rect,track)
-                    return None
+                    return 'Hit_Barrier'
             # wait a bit so we can follow the bullet
             time.sleep(bullet_wait)
 
@@ -288,44 +295,35 @@ class Tank(object):
 #-----------------End of Tank Class----------------------------------------
 
 #---------------------Robot Tank Class ver 0.2--------------------------------------
-# Inherited class of Tank for robot tanks
-class Robot_Tank(Tank):
-    def  __init__(self,center=(500,500),color=GREEN,size=25,
-                  lives=1,ammo=10,speed=1,max_range=WINDOWWIDTH/10):
+# Inherited classes of Tank for robot tanks
 
-    # This is the initializer called each time you create a new robot tank.
-    # The size is specified as a single variable because the tank is drawn
-    # in a square.
-        self.color = color
-        self.size = size
-        self.direction = random.randrange(0,359) # direction the tank (and gun) is pointed
-        self.lives = lives  # number of lives we have
-        self.ammo = ammo    # number of rounds we can fire in each life
-        self.speed = speed
-        self.max_range = max_range
-        
-        self.target = None  # initially not locked, otherwise hold target tank
+###################################################################################
+### Competition logic for red robot tanks inserted here
+###################################################################################
+
+
+class Red_Robot_Tank(Tank):
+
     
-        self.home = center  # remember center as the home base
+    def  __init__(self,center=(500,500),color=LIGHTRED,size=25,direction=180,
+                  lives=1,ammo=10,speed=1,max_range=WINDOWWIDTH/10,army=RED,
+                  tank_type='Scout'):
 
-        # add this tank to the list of tanks
-        Tank.tanks.append(self)
-        robotank.append(self)
+        '''# This is the initializer called each time you create a new robot tank.
+        # The size is specified as a single variable because the tank is drawn
+        # in a square.'''
 
-        # dx and dy are the distance accumulators for the distance not moved
-        # by the integer pixel count
-        self.dx = 0.
-        self.dy = 0.
+        # Call the parent (Tank) class initializer for general setup
+        super().__init__(center,color,size,direction,
+                  lives,ammo,speed,max_range,army,
+                  tank_type)
 
-        # build a rectangle for this tank and save as an attribute
-        # center was given rather than topleft, so adjust for half the size
-        self.rect = pygame.Rect(center[0]-int(size/2),
-                                center[1]-int(size/2),size,size)
         
+        # Set up special stuff for robots
+        self.target = None  # initially not targeted, otherwise hold target tank
+        self.lockout_timer = 0 # initially not lock out of targeting
 
-        # now draw the tank
-        self.draw()
-
+        
         return # return from Robot_Tank.__init__
 
     def move(self):
@@ -333,67 +331,177 @@ class Robot_Tank(Tank):
     # robot.  It calls the Tank class move and shoot methods to do the actual
     # work.
 
+        LOCKOUTTIME = 1  # LOCK OUT RETARGETING (NUMBER OF GAME CYCLES)       
+        ALLOWED_AIM_ERROR = 2 # Allow 2 degrees error in aim.
 
+        #if someone else already killed your target, choose another
+        if self.target != None:
+            if self.target.lives <= 0:
+                self.target = None
 
         # if not locked on target, choose a live one at random
-        while self.target == None:
-            index = random.randrange(0,7)  # only lock on to first two tanks
+        if self.lockout_timer > 0:  # Don't retarget during lockout
+            self.lockout_timer -= 1  # Count down the timer
+        else:
+            index = random.randrange(0,len(Tank.tanks))  # choose a random tank
             if  ((Tank.tanks[index] != self) &
                (Tank.tanks[index].lives >0)):   # see if this tank is still alive
-                    self.target = Tank.tanks[index] # live duck, latch on
+                    if ( Tank.tanks[index].army != self.army ):  # don't kill one of your own
+                        self.target = Tank.tanks[index] # live duck, latch on
 
 
-        #*************
-        # compute the angle to the target        
-        #*************
-       
+# If we have a target, see if we can shoot him.
 
-        x = self.rect.center[0]
-        y = self.rect.center[1]
-        targetx = self.target.rect.center[0]
-        targety = self.target.rect.center[1]
+        if self.target != None:
 
-        # find the x and y distance to the target
+            # find distance and direction using general purpose function
+            
+            self.direction_to_target,distance_to_target = locate(self.rect,self.target.rect)
 
-        xtotarget = targetx - x
-        ytotarget = -(targety - y)
+            # see if gun is pointed in his direction
+            if (is_aim_ok(self.direction,self.direction_to_target,ALLOWED_AIM_ERROR)):
+          
+           
+                # aim is OK, if target in range of our gun, shoot and unlock from him
+                if abs(distance_to_target) < self.max_range:
+                    
+                    if(self.shoot(max_range = self.max_range) == 'Hit_Barrier'):
+                        self.direction = self.direction- (random.randrange(100,260))
+                        if self.direction < 0 :
+                            self.direction += (360)  # keep in 0 to 360 degrees
+                        self.lockout_timer = LOCKOUTTIME # don't retarget until we clear barrier                   
+                    self.target = None  # Drop this guy as a target
 
-      
-        # compute direction to target
-        if (xtotarget == 0) :  # avoid infinite atan function
-            xtotarget = 1  # avoid a divide by zero
-        self.direction = 57.4 * math.atan(ytotarget/xtotarget)
-        if xtotarget < 0:
-            self.direction = self.direction + 180
+        # Slew the turrent toward the target by a slew angle increment
+            self.direction = slew(self.direction,self.direction_to_target,SLEWANGLE)
 
-        # distance to target
-        distancetotarget = math.sqrt(xtotarget**2+ ytotarget**2)
-
-        # if target in range of our short gun, shoot and unlock from him
-        if abs(distancetotarget) < self.max_range:
-            cone = random.random() * BOTCONE
-            if cone > BOTCONE/2:
-                cone -= BOTCONE/2
-            if cone < BOTCONE/2:
-                cone = cone * -1
-            self.turn(turn_angle = cone)
-            self.shoot(max_range = self.max_range)
-            self.target = None
-
-        
-
-        # Move, if we hit something, spin around in a random direction
+        # Move, if we bumped into something, reverse direction
         # and unlock from any targets.
+
         stuck = Tank.move(self)
         if stuck == True:  # True means we are stuck against something
-            self.direction = random.randrange(0, 359) # spin to random direction
+            self.direction = self.direction- (random.randrange(100,260))
+            if self.direction < 0 :
+                self.direction += 360  # keep in 0 to 360 degrees
+            elif self.direction > 360:
+                self.direction -= 360
             self.target = None  # unlock from any targets
+            self.lockout_timer = LOCKOUTTIME # don't retarget until we clear obstacle
+
+            Tank.move(self) # back away from barrier
 
 
 
 
-        return # return from Robot_Tank.move
+        return # return from red Robot_Tank.move
 
+###################################################################################
+#### End of competition logic for red robot tanks
+###################################################################################
+
+
+###################################################################################
+### Competition logic for Yellow robot tanks inserted here
+###################################################################################    
+    
+
+class Yellow_Robot_Tank(Tank):
+
+    
+    def  __init__(self,center=(500,500),color=LIGHTYELLOW,size=25,direction=180,
+                  lives=1,ammo=10,speed=1,max_range=WINDOWWIDTH/10,army=YELLOW,
+                  tank_type='Scout'):
+
+        '''# This is the initializer called each time you create a new robot tank.
+        # The size is specified as a single variable because the tank is drawn
+        # in a square.'''
+
+        # Call the parent (Tank) class initializer for general setup
+        super().__init__(center,color,size,direction,
+                  lives,ammo,speed,max_range,army,
+                  tank_type)
+        
+        
+        # Set up special stuff for robots
+        self.target = None  # initially not targeted, otherwise hold target tank
+        self.lockout_timer = 0 # initially not lock out of targeting
+
+        
+        return # return from Robot_Tank.__init__
+    
+  
+    def move(self):
+    # Overload the tank move class so we can check for special actions for the
+    # robot.  It calls the Tank class move and shoot methods to do the actual
+    # work.
+
+        LOCKOUTTIME = 1  # LOCK OUT RETARGETING (NUMBER OF GAME CYCLES)       
+        ALLOWED_AIM_ERROR = 2 # Allow 2 degrees error in aim.
+
+        #if someone else already killed your target, choose another
+        if self.target != None:
+            if self.target.lives <= 0:
+                self.target = None
+
+        # if not locked on target, choose a live one at random
+        if self.lockout_timer > 0:  # Don't retarget during lockout
+            self.lockout_timer -= 1  # Count down the timer
+        else:
+            index = random.randrange(0,len(Tank.tanks))  # choose a random tank
+            if  ((Tank.tanks[index] != self) &
+               (Tank.tanks[index].lives >0)):   # see if this tank is still alive
+                    if ( Tank.tanks[index].army != self.army ):  # don't kill one of your own
+                        self.target = Tank.tanks[index] # live duck, latch on
+
+
+# If we have a target, see if we can shoot him.
+
+        if self.target != None:
+
+            # find distance and direction using general purpose function
+            
+            self.direction_to_target,distance_to_target = locate(self.rect,self.target.rect)
+
+            # see if gun is pointed in his direction
+            if (is_aim_ok(self.direction,self.direction_to_target,ALLOWED_AIM_ERROR)):
+          
+           
+                # aim is OK, if target in range of our gun, shoot and unlock from him
+                if abs(distance_to_target) < self.max_range:
+                    
+                    if(self.shoot(max_range = self.max_range) == 'Hit_Barrier'):
+                        self.direction = self.direction- (random.randrange(91,269))
+                        if self.direction < 0 :
+                            self.direction += (360)  # keep in 0 to 360 degrees
+                        self.lockout_timer = LOCKOUTTIME # don't retarget until we clear barrier                   
+                    self.target = None  # Drop this guy as a target
+
+        # Slew the turrent toward the target by a slew angle increment
+            self.direction = slew(self.direction,self.direction_to_target,SLEWANGLE)
+
+        # Move, if we bumped into something, reverse direction
+        # and unlock from any targets.
+
+        stuck = Tank.move(self)
+        if stuck == True:  # True means we are stuck against something
+            self.direction = self.direction- (random.randrange(100,260))
+            if self.direction < 0 :
+                self.direction += 360  # keep in 0 to 360 degrees
+            elif self.direction > 360:
+                self.direction -= 360
+            self.target = None  # unlock from any targets
+            self.lockout_timer = LOCKOUTTIME # don't retarget until we clear obstacle
+
+            Tank.move(self) # back away from barrier
+
+
+
+
+        return # return from yellow Robot_Tank.move
+
+###################################################################################
+#### End of competition logic for yellow robot tanks
+###################################################################################
 
 #----------------   End of Robot_Tank class -------------------------------
     
@@ -433,6 +541,21 @@ class Mine(object):
 
     mines = []   # hold the list of mines
     last_shown = time.time()  # when mines were last shown
+
+    def __init__(self,center=(300,300),size= 10,color=BLUE):
+    # initializer for mine, called when one is created
+        self.color = color # save color as attribute
+        self.armed = True # arm the mine
+    
+        # Add to list of mines
+        Mine.mines.append(self)
+
+
+        # build a rectangle for this mine and save as attribute
+        self.rect = pygame.Rect(center[0]-int(size/2),center[1]-int(size/2),
+                                size,size)
+
+        return # return from Mine.__init__
 
     def show_all():
     #Called at the Mine class level to show all the mines
@@ -478,20 +601,7 @@ class Mine(object):
                 
             
 
-    def __init__(self,center=(300,300),size= 10,color=BLUE):
-    # initializer for mine, called when one is created
-        self.color = color # save color as attribute
-        self.armed = True # arm the mine
-    
-        # Add to list of barriers
-        Mine.mines.append(self)
 
-
-        # build a rectangle for this mine and save as attribute
-        self.rect = pygame.Rect(center[0]-int(size/2),center[1]-int(size/2),
-                                size,size)
-
-        return # return from Barrier.__init__
 
     def draw(self):
     # Mine method to draw the mine. Does update the display
@@ -509,6 +619,102 @@ class Mine(object):
 
 
 #---------------- General purpose functions not part of a class ver 0.1 ---------
+
+# General purpose robot routine to slew direction toward a target 
+# by an increment of angle. Return the revised direction.
+
+def slew(direction,direction_to_target,slewangle):
+
+   
+    delta_angle = direction_to_target - direction
+
+    if  ((delta_angle <0) & (abs(delta_angle) >= 180) ):
+        slew = 'left'
+    elif  ( (delta_angle >0) & (abs(delta_angle) >= 180) ):
+        slew = 'right'
+    elif ( (delta_angle > 0) & (abs(delta_angle) <= 180) ):
+        slew = 'left'
+    elif ( (delta_angle < 0) & (abs(delta_angle) <= 180) ):
+        slew = 'right'
+    else:
+        slew = 'none'
+
+    # slew the direction toward the target by the slew angle
+
+    if slew == 'right':
+        direction -= slewangle
+    elif slew == 'left':
+        direction += slewangle
+    else:
+        return direction # no action required
+
+    # correct for cross the zero axis
+    if direction < 0:
+        direction += 360
+    if direction > 360:
+        direction -= 360
+
+    
+    return direction
+
+# General purpose robot routine to determine the angle and distance between two
+# rectangles. Returns angle and distance.
+
+def locate(source_rectangle,destination_rectangle):
+
+    x = source_rectangle.center[0]
+    y = source_rectangle.center[1]
+    targetx = destination_rectangle.center[0]
+    targety = destination_rectangle.center[1]
+
+    # find the x and y distance to the target
+
+    xtotarget = targetx - x
+    ytotarget = -(targety - y)
+
+  
+    # compute direction to target, move will slew toward him.
+    if (xtotarget == 0) :  # avoid infinite atan function
+        xtotarget = 1  # avoid a divide by zero
+    direction_to_target = 57.3 * math.atan(ytotarget/xtotarget)
+    if xtotarget < 0:
+        direction_to_target = direction_to_target + 180
+
+    
+    # distance to target
+    distance_to_target = math.sqrt(xtotarget**2+ ytotarget**2)
+
+    return (direction_to_target,distance_to_target)
+            
+# general purpose robot routine to see if the target is in the
+# angle range of the direction we are pointed. Returns True if we are
+# on target.
+
+def is_aim_ok(direction,direction_to_target,tolerance):
+
+
+    # first fix any issues with crossing the zero axis.
+
+    if (  (direction > 0 & (direction < 90) ) &
+            (direction_to_target >270) ):
+
+            direction += 180  # move to left quantrant
+            direction_to_target -= 180
+
+    elif ( (direction_to_target > 0 & (direction_to_target < 90) ) &
+            (direction > 270) ):
+
+           direction_to_target += 180 # move to left quantrant
+           direction -= 180
+
+    # that possible problem fixed, now do the compare and return
+    # either true or false
+
+   
+    if ( abs(direction - direction_to_target) <= tolerance ):
+        return True
+    else:
+        return False
     
 def check_wall(rect):
 # General purpose function to test if an  hit a wall.
@@ -528,11 +734,23 @@ def check_wall(rect):
 def check_barrier(rect):
 # General purpose function to test if an  hit a barrier.
 # Call with a rectangle object
-# Returns None if no wall struck, otherwise True
+# Returns None if no barruer struck, otherwise True
 
     # Run through the list of barriers to see if we hit one
     for barrier in Barrier.barriers:
         if rect.colliderect(barrier.rect):
+            return True
+
+    return False
+
+def check_tank(rect):
+# General purpose function to test if an  hit another tank
+# Call with a rectangle object
+# Returns None if no other tank struck, otherwise True
+    # Run through the list of tanks to see if we bumped into one
+    for tank in Tank.tanks:
+        if (rect.colliderect(tank.rect) &
+           (tank.rect != rect) ):
             return True
 
     return False
@@ -606,13 +824,12 @@ def update_scores(tank1,tank2):
     write_text(text='Tank2 ammo '+str(tank2.ammo),topleft=tank2_ammo_topleft,
                font_size=25,color=RED)
 
-    if gamemode == '2':
-        write_text(text='Tank1 lives left '+str(tank1.lives),
-                   topleft= tank1_lives_topleft,              
-                   font_size=25,color=YELLOW)
-        write_text(text='Tank1 ammo '+str(tank1.ammo),
-                   topleft=tank1_ammo_topleft,              
-                   font_size=25,color=YELLOW)
+    write_text(text='Tank1 lives left '+str(tank1.lives),
+               topleft= tank1_lives_topleft,              
+               font_size=25,color=YELLOW)
+    write_text(text='Tank1 ammo '+str(tank1.ammo),
+               topleft=tank1_ammo_topleft,              
+               font_size=25,color=YELLOW)
 
     pygame.display.update()
 
@@ -626,32 +843,41 @@ def update_scores(tank1,tank2):
 # Initialize things before the loop
 
 pygame.key.set_repeat(500,50) # 500 msec 'til repeat then 20 times a second
-#pygame.key.set_repeat(0,0) 
+
 # Create the tanks
-tank1_home = ( WINDOWWIDTH-100,int(WINDOWHEIGHT/2))
-if gamemode == '2':
-    tank1 = Tank(direction=90,speed=0,color=YELLOW,
-                 center=tank1_home,lives=5,ammo=60 )
+tank1_home = ( WINDOWWIDTH-100,int(WINDOWHEIGHT/4))
+tank1 = Yellow_Robot_Tank(speed=2,direction=180,color=YELLOW,
+            max_range= WINDOWWIDTH/4,
+            center=tank1_home,size=35,lives=1,ammo=30,army=YELLOW,
+            tank_type='Master')
 
 tank2_home = (100,int(WINDOWHEIGHT/2))
-tank2 = Tank(direction=90,speed=0,color=RED,
-             center =tank2_home,lives=5,ammo=60)
+tank2 = Red_Robot_Tank(speed=2,direction=0,color=RED,max_range=WINDOWWIDTH/4,
+             center =tank2_home,size=35,lives=1,ammo=30,army=RED,
+             tank_type='Master')
 
-# Create the barriers, starting with the home barriers
-if gamemode == '2':
-    Barrier(left=tank1_home[0]-25,top=tank1_home[1]-50,size=(10,100),color=WHITE)
-Barrier(left=tank2_home[0]+25,top=tank1_home[1]-50,size=(10,100),color=WHITE)
 
-Barrier(left=500,top=250,size=(20,75),color=WHITE)  # create a barrier for test
+# Create the the barriers, either in  random locations
 
-# Create the rest of the barriers, either in known places or random locations
+for i in range (0, NUMBERBARRIERS):
+    Barrier(left=random.randrange(250,WINDOWWIDTH-250),
+        top=random.randrange(100,WINDOWHEIGHT-100),size=(20,75),color=WHITE)  # create a barrier
+
 
 # Create some robot hunter killer tanks for interest
-if NUMBERROBOTS > 0:
-    for i in range(0,NUMBERROBOTS):
-        Robot_Tank( center=( random.randrange(200,WINDOWWIDTH-200),
-                      random.randrange(50,WINDOWHEIGHT-50) ),
-                      color=GREEN )    
+if NUMBERREDROBOTS > 0:  # First the red robots
+    for i in range(0,NUMBERREDROBOTS):
+        Red_Robot_Tank(speed=2, center=( 200,WINDOWHEIGHT-100- (65*i) ),
+                      direction=0,color=LIGHTRED,army=RED,
+                      max_range=WINDOWWIDTH/10,tank_type='Scout')
+
+if NUMBERYELLOWROBOTS > 0:  # Then the yellow robots
+    for i in range(0,NUMBERYELLOWROBOTS):
+        Yellow_Robot_Tank(speed=2, center=( WINDOWWIDTH-200,
+                     WINDOWHEIGHT-100 - (65*i) ),
+                      direction=180,color=LIGHTYELLOW,army=YELLOW,
+                      max_range=WINDOWWIDTH/10,tank_type='Scout')
+
 # Create the mines and show them for a few seconds, then hide
 if NUMBERMINES > 0:
     for i in range(0,NUMBERMINES):
@@ -659,12 +885,14 @@ if NUMBERMINES > 0:
                       random.randrange(50,WINDOWHEIGHT-50) ),
                       size=10,color=BLUE )
 
-Mine.flash_all(period=0,flashtime=5) # give folks a peek to start with
+if NUMBERMINES >0:
+    Mine.flash_all(period=0,flashtime=5) # if mined, give folks a peek to start 
 
 #  Main game loop, runs until window x'd out or someone wins
-if gamemode == '2':
-    update_scores(tank2,tank2)   # put up initial scores
-	
+
+#update_scores(tank1,tank2)  # put up initial scores
+delaytimer = GAMEDELAY      # initialize speed of the game
+stop = False
 while True:
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -672,62 +900,67 @@ while True:
             sys.exit()
     
         if event.type is KEYDOWN:
-
-            key = pygame.key.name(event.key)
-            if gamemode == '2':    
-                if(key == 'right'):
-                    tank1.turn(turn_angle = -2)
-                elif(key == 'down'): # shift down one gear
-                    tank1.brake()
-                elif(key == 'left'):
-                    tank1.turn(turn_angle = +2)
-                elif(key == 'up'):  # shift up one gear
-                    tank1.speed_up()
-                elif(key == 'right ctrl'): # shoot key - change as desired
-                    tank1.shoot()
-                    update_scores(tank1,tank2)
-
-
-#---------------------tank 2 stuff----------------------------------#
-            if(key == 'd'):
-                tank2.turn(turn_angle = -2)
-            elif(key == 's'): # shift down one gear
-                tank2.brake()
-            elif(key == 'a'):
-                tank2.turn(turn_angle = +2)
-            elif(key == 'w'):  # shift up one gear
-                tank2.speed_up()
-            elif(key == 'tab'): # shoot key - change as desired
-                tank2.shoot()
-                if gamemode == '2':
-                    update_scores(tank1,tank2)
-                if gamemode == '1':
-                    update_scores(tank2,tank2)
-          #************** put in logic for second tank keys *****************#
-
-# check for end of game
-    if gamemode == '2':
-        if (tank1.lives < 1) | (tank2.lives < 1): # see if either one is dead
-            #check for tank 1 win
-            if (tank2.lives < 1):
-                write_text(text= 'YELLOW TANK WINS',
-                           topleft=(250,250),font_size=90,color=YELLOW)
-            elif (tank1.lives < 1):
-                write_text(text= 'RED TANK WINS',
-                           topleft=(250,250),font_size=90,color=RED)
-
             
-        time.sleep(5) # display winning message for 5 seconds
+            key = pygame.key.name(event.key)
+
+            if(key == 'right'):
+                tank1.turn(turn_angle = -2)
+            elif(key == 'down'): # slow down the game
+                delaytimer += .01
+                if delaytimer > 1:
+                    delaytimer = 1
+            elif(key == 'left'):
+                tank1.turn(turn_angle = +2)
+            elif(key == 'up'):  # speed up the game
+                 delaytimer -= .01
+                 if delaytimer < .01:
+                     delaytimer = .01
+            elif(key == 'space'):
+                #print(stop)
+                if (stop == True):
+                    stop = False
+                elif (stop == False):
+                    stop = True
+               
+
+
+     
+    # check for Yellow army win
+    lives_red = 0
+    for tank in Tank.red_tanks:
+        lives_red += tank.lives
+
+    if (lives_red < 1):
+        write_text(text= 'YELLOW ARMY WINS',
+                   topleft=(250,250),font_size=90,color=YELLOW)
+
+    # Check for Red army win
+    lives_yellow = 0
+    for tank1 in Tank.yellow_tanks:
+        lives_yellow += tank1.lives
+
+
+    if (lives_yellow < 1):
+        write_text(text= 'RED ARMY WINS',
+                   topleft=(250,250),font_size=90,color=RED)
+        
+    # check for end of game
+
+    if ((lives_red < 1) | (lives_yellow < 1)):
+        print ('Game over')
+
+        time.sleep(10) # display winning message for 10 seconds
         pygame.quit()
         sys.exit()
         
     # do the routine update things each time through the main loop   
-    Mine.flash_all(period=15,flashtime=1) # maybe give a peek at mines   
-    Tank.move_all()
+    if (NUMBERMINES > 0):
+        Mine.flash_all(period=15,flashtime=1) # maybe give a peek at mines   
+
+    if (stop == False):
+        Tank.move_all()
     pygame.display.update()
-    time.sleep(.05)
+    time.sleep(delaytimer)
 
 
 sys.exit() # shouldn't ever get here.  Exit is in main loop.
-        
-

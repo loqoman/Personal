@@ -1,0 +1,49 @@
+
+class Rectangle(Widget):
+# class to wrap the pygame rectangle class to standardize with Widgets 
+
+    def __init__(self, window=windowSurface,color=BLACK,
+                 topleft = (200,200), width = 30, height = 20,
+                 name = '',outline_width = 1, # width of outline, 0 = fill
+                 app_handler=Widget.handler):
+
+        self.window = window
+        self.color = color
+        self.topleft = topleft
+        self.left = topleft[0]      # required by isclicked method in Widget
+        self.top = topleft[1]       # "
+        self.width = width          # "
+        self.height = height        # "
+        self.right = self.left + width
+        self.bottom = self.top + height
+        self.name = name
+        self.outline_width = outline_width
+        self.app_handler = app_handler
+
+        # Add widget object keyed by name to widget dictionary.
+        # Non-null Widget names must be unique.
+        
+        if ( (name != '') and (name not in Widget.widgetlist) ):
+            Widget.widgetlist[name] = (self,app_handler)
+        elif (name != ''):
+            print ('Error - duplicate widget name of ' + name)
+
+        self.draw()  # invoke the draw method to draw it
+
+        return
+
+    def draw(self):     # Rectangle method to do the draw
+        
+        # get a rectangle object and draw it
+        self.rect = pygame.Rect(self.left,self.top,self.width,self.height)
+        pygame.draw.rect(self.window,self.color,self.rect,
+                         self.outline_width)
+        pygame.display.update(self.rect)
+
+        return
+    
+    def handler(self):  # Rectangle handler
+        self.app_handler(self)  # nothing special to do, call app_handler
+        return
+#Timer class
+

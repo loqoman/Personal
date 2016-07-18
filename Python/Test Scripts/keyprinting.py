@@ -49,3 +49,15 @@ pygame.key.set_repeat(200,100)
 background_rect = pygame.Rect(0,0,WINDOWWIDTH,WINDOWHEIGHT)
 pygame.draw.rect(windowSurface,BACKGROUND,background_rect,0)
 '''
+while True:
+    for event in pygame.event.get():
+         if event.type == pygame.QUIT: 
+            sys.exit()
+            elif (event.type == KEYDOWN):
+                key = pygame.key.name(event.key)
+                print(key)
+                if ((event.key == K_ESCAPE)
+                   or (event.key == K_q)):
+                      sys.exit()
+				
+

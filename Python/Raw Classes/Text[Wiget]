@@ -1,0 +1,105 @@
+
+class Text(Widget):
+
+    def __init__(self,window=windowSurface,
+                 color=BLACK,background_color=Widget.background_color,
+                 topleft=(200,200),name= '',
+                 font_size=20,max_chars=20,text='',
+                 outline=True,outline_width=1,
+                 justify = 'LEFT',
+                 app_handler=Widget.handler):
+
+        
+        # initialize the properties
+        self.window=window
+        self.color= color
+        self.background_color = background_color
+        self.name = name
+        self.font_size = font_size
+        self.max_chars = max_chars
+        self.text = text
+        self.outline = outline
+        self.outline_width = outline_width
+        self.justify = justify
+        self.app_handler = app_handler
+        
+        self.topleft=topleft
+        self.left=topleft[0]    # reguired by isclicked method in Widget
+        self.top=topleft[1]     # "
+        
+        # render a maximum size string to set size of text rectangle
+        max_string = ''
+        for i in range(0,max_chars):
+            max_string += 'D'
+
+        maxFont = pygame.font.SysFont(None,font_size)
+        maxtext = maxFont.render(max_string,True,color)
+        maxRect= maxtext.get_rect()
+        maxRect.left = self.left
+        maxRect.top = self.top
+        self.maxRect = maxRect  # save for other references
+        self.maxFont = maxFont
+
+        # now set the rest required by isclicked method
+        self.width = maxRect.right - maxRect.left
+        self.height = maxRect.bottom -  maxRect.top
+
+
+        # Add widget object keyed by name to widget dictionary.
+        # Non-null Widget names must be unique.
+        
+        if ( (name != '') and (name not in Widget.widgetlist) ):
+            Widget.widgetlist[name] = (self,app_handler)
+        elif (name != ''):
+            print ('Error - duplicate widget name of ' + name)
+
+        self.draw()  # invoke the method to do the draw
+
+        return   # end of Text initializer
+
+    # Text method to draw the text and any outline on to the screen
+    def draw(self):
+        # fill the maxRect to background color to wipe any prev text
+        pygame.draw.rect(self.window,self.background_color,
+                         (self.maxRect.left,self.maxRect.top,
+                          self.width, self.height),0)
+
+        # if outline is requested, draw the outline 4 pixels bigger than
+        # max text.  Reference topleft stays as specified
+        
+        if self.outline:
+            pygame.draw.rect(self.window,self.color,
+                             (self.maxRect.left-self.outline_width-2,
+                              self.maxRect.top-self.outline_width-2,
+                              self.width+(2*self.outline_width)+2,
+                              self.height+(2*self.outline_width)+2),
+                              self.outline_width)
+
+
+        # Now put the requested text within maximum rectangle
+        plottext = self.maxFont.render(self.text,True,self.color)
+        plotRect = plottext.get_rect()
+
+        plotRect.top = self.top # top doesn't move with justify
+
+        # justify the text
+        if self.justify == 'CENTER':
+            plotRect.left = self.left + int(plotRect.width/2) 
+        elif self.justify == 'LEFT':
+            plotRect.left = self.left
+        elif self.justify == 'RIGHT':
+            plotRect.right = self.maxRect.right
+        else:
+            print('Illegal justification in Text object')
+
+        # blit the text and update screen
+        self.window.blit(plottext,plotRect)
+
+        pygame.display.update()
+
+    # Text method to update text and redraw
+    def update(self,text):
+        self.text = text
+        self.draw()
+
+
