@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Canvas.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;JavaIntro_-_Shapes&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">edu.pcwe.uw.javaintro.shapes</a> &gt; <span class="el_source">Canvas.java</span></div><h1>Canvas.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.pcwe.uw.javaintro.shapes;
+
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+/**
+ * This class provides a simple window for doing graphical exercises, 
+ * such as drawing polygons and circles. If you use this class you
+ * will have to learn to use the{@link java.awt.Graphics2D} class.
+ * 
+ * @see java.awt.Graphics2D
+ * @see Shape
+ * @author jack
+ */
+public class Canvas
+    implements Runnable
+{
+    /** The default width of the canvas. */
+    public static final int DEFAULT_WIDTH   = 500;
+
+    /** The default height of the canvas. */
+    public static final int DEFAULT_HEIGHT  = 500;
+    /**
+     * For testing only. Indicates to the start() method
+     * that no special test logic is to take place.
+     * @see #start
+     */
+    protected static final int  THROW_NONE                  = 0;
+    
+    /**
+     * For testing only. Indicates to the start() method
+     * that no special test logic is to take place. That
+     * an InvocationTargetException is to be simulated.
+     */
+    protected static final int  THROW_INVOCATION_EXCEPTION  = 1;
+    
+    /**
+     * For testing only. Indicates to the start() method
+     * that no special test logic is to take place. That
+     * an InterruptedException is to be simulated.
+     */
+    protected static final int  THROW_INTERRUPTED_EXCEPTION = 2;
+    
+<span class="fc" id="L58">    private final InternalFrame frame       = new InternalFrame( &quot;Drawing Board&quot; );</span>
+<span class="fc" id="L59">    private final List&lt;Shape&gt;   allShapes   = new ArrayList&lt;&gt;();</span>
+    private Graphics2D          graphicsCtx;
+    private final Dimension     size;
+    
+<span class="fc" id="L63">    private int throwFlag   = THROW_NONE;</span>
+    
+    /**
+     * Default constructor. The width and height of the Canvas
+     * are set to DEFAULT_WIDTH and DEFAULT_HEIGHT, respectively.
+     */
+    public Canvas()
+    {
+<span class="fc" id="L71">        this( DEFAULT_WIDTH, DEFAULT_HEIGHT );</span>
+<span class="fc" id="L72">    }</span>
+    
+    /**
+     * Constructor to create a canvas with the given width and height.
+     * 
+     * @param width     The given width.
+     * @param height    The given height.
+     */
+    public Canvas( int width, int height )
+<span class="fc" id="L81">    {</span>
+<span class="fc" id="L82">        size = new Dimension( width, height );</span>
+<span class="fc" id="L83">    }</span>
+    
+    /**
+     * Causes the canvas to be repainted. This is necessary any time
+     * you change the state of the Canvas, for example after you add
+     * a new shape.
+     * 
+     * @see Shape#addShape(edu.pcwe.uw.javaintro.shapes.Shape) 
+     * @see Shape#removeShape(edu.pcwe.uw.javaintro.shapes.Shape) 
+     * @see Shape#redraw() 
+     */
+    public void repaint()
+    {
+<span class="fc" id="L96">        frame.repaint();</span>
+<span class="fc" id="L97">    }</span>
+    
+    /**
+     * Starts the GUI in a new thread. Blocks until the GUI is fully built
+     * and ready to use.
+     */
+    public void start()
+    {
+        try
+        {
+<span class="fc" id="L107">            SwingUtilities.invokeAndWait( this );</span>
+        }
+<span class="nc" id="L109">        catch ( InvocationTargetException | InterruptedException exc )</span>
+        {
+            // If exception is due to testing throw an Error; otherwise exit.
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            if ( throwFlag == THROW_NONE )</span>
+            {
+<span class="nc" id="L114">                exc.printStackTrace();</span>
+<span class="nc" id="L115">                System.exit( 1 );</span>
+            }
+            else
+<span class="nc" id="L118">                throw new Error();</span>
+<span class="fc" id="L119">        }</span>
+<span class="fc" id="L120">    }</span>
+    
+    /**
+     * Builds the Canvas GUI; required by interface Runnable.
+     */
+    @Override
+    public void run()
+    {
+<span class="fc" id="L128">        Container   pane    = frame.getContentPane();</span>
+
+<span class="fc" id="L130">        pane.setPreferredSize( size );</span>
+<span class="fc" id="L131">        pane.setBackground( Color.WHITE );</span>
+
+<span class="fc" id="L133">        frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );</span>
+<span class="fc" id="L134">        frame.pack();</span>
+<span class="fc" id="L135">        frame.setVisible( true );</span>
+
+<span class="fc" id="L137">        graphicsCtx = (Graphics2D)pane.getGraphics();</span>
+<span class="fc" id="L138">    }</span>
+    
+    /**
+     * Closes the GUI, releasing all associated resources.
+     */
+    public void close()
+    {
+<span class="fc" id="L145">        frame.setVisible( false );</span>
+<span class="fc" id="L146">        frame.dispose();</span>
+<span class="fc" id="L147">    }</span>
+    
+    /**
+     * Places the canvas GUI in the minimized state.
+     */
+    public void minimize()
+    {
+<span class="fc" id="L154">        frame.setState( JFrame.ICONIFIED );</span>
+<span class="fc" id="L155">    }</span>
+
+    
+    /**
+     * Places the canvas GUI in the restored state.
+     */
+    public void restore()
+    {
+<span class="fc" id="L163">        frame.setState( JFrame.NORMAL );</span>
+<span class="fc" id="L164">    }</span>
+    
+    /**
+     * Adds a Shape to the draw queue. Merely adding a Shape to the queue
+     * does not mean it is drawn; to draw the Shape immediately call
+     * Canvas.repaint(). All shapes in the queue will be redrawn whenever all
+     * or part of a Canvas is exposed.
+     * 
+     * @param shape The shape to add to the queue.
+     * 
+     * @see #removeShape( Shape )
+     * @see #clearShapes() 
+     * @see #repaint() 
+     */
+    public void addShape( Shape shape )
+    {
+<span class="fc" id="L180">        allShapes.add( shape );</span>
+<span class="fc" id="L181">    }</span>
+    
+    /**
+     * Removes a Shape from the queue. The drawing of the Shape on the
+     * Canvas will not be immediately removed; to remove the Shape from
+     * the Canvas immediately, call Canvas.repaint().
+     * 
+     * @param shape The shape to remove.
+     * 
+     * @return true if &lt;em&gt;shape&lt;/em&gt; is found in the queue and removed;
+     *         false if &lt;em&gt;shape&lt;/em&gt; could not be found in the queue.
+     * 
+     * @see #removeShape( Shape )
+     * @see #clearShapes() 
+     * @see #repaint() 
+     */
+    public boolean removeShape( Shape shape )
+    {
+<span class="fc" id="L199">        boolean rval    = allShapes.remove( shape );</span>
+<span class="fc" id="L200">        return rval;</span>
+    }
+    
+    /**
+     * Removes all Shapes from the draw queue.
+     * 
+     * @see #addShape( Shape )
+     * @see #removeShape( Shape )
+    */
+    public void clearShapes()
+    {
+<span class="fc" id="L211">        allShapes.clear();</span>
+<span class="fc" id="L212">    }</span>
+    
+    /**
+     * Gets a read-only list of all the Shapes in the draw queue.
+     * 
+     * @return A read-only list of all the Shapes in the draw queue.
+     */
+    public List&lt;Shape&gt; getShapes()
+    {
+<span class="fc" id="L221">        List&lt;Shape&gt; list    = Collections.unmodifiableList( allShapes );</span>
+<span class="fc" id="L222">        return list;</span>
+    }
+        
+    /**
+     *  Redraws all the Shapes in the draw queue.
+     */
+    public void redraw()
+    {
+<span class="fc bfc" id="L230" title="All 2 branches covered.">        for ( Shape shape : allShapes )</span>
+<span class="fc" id="L231">            shape.draw( graphicsCtx );</span>
+<span class="fc" id="L232">    }</span>
+
+    private class InternalFrame extends JFrame
+    {
+        public InternalFrame( String title )
+<span class="fc" id="L237">        {</span>
+<span class="fc" id="L238">            super( title );</span>
+<span class="fc" id="L239">        }</span>
+        
+        @Override
+        public void paint( Graphics graphics )
+        {
+<span class="fc" id="L244">            super.paint( graphics );</span>
+<span class="fc" id="L245">            graphics.setClip( 0, 0, getWidth(), getHeight() );</span>
+<span class="fc" id="L246">            redraw();</span>
+<span class="fc" id="L247">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

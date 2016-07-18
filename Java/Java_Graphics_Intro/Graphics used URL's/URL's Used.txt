@@ -1,0 +1,11 @@
+https://www.youtube.com/watch?v=2l5-5PMUc5Y
+
+---Youtube video on a very basic graphics with javax and JFrame---
+
+https://docs.oracle.com/javase/7/docs/api/java/awt/Graphics2D.html
+
+---Documentation for Graphics2D class---
+
+https://docs.oracle.com/javase/tutorial/2d/basic2d/
+
+---Java tutorial on 2D graphics

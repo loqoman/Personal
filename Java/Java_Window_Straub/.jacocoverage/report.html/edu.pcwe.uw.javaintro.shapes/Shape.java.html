@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Shape.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;JavaIntro_-_Shapes&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">edu.pcwe.uw.javaintro.shapes</a> &gt; <span class="el_source">Shape.java</span></div><h1>Shape.java</h1><pre class="source lang-java linenums">package edu.pcwe.uw.javaintro.shapes;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+/**
+ * Abstract base class for implementing a shape.
+ * 
+ * @author jack
+ */
+public abstract class Shape
+{
+    private DPoint                      origin;
+    private Color                       fillColor;
+    private Color                       edgeColor;
+    
+    /**
+     * Draws the given shape on a canvas. Drawing resources available
+     * in the base class are &lt;em&gt;origin, fillColor&lt;/em&gt; and &lt;em&gt;edgeColor.&lt;/em&gt;
+     * This method must be implemented
+     * according to the following rules:
+     * &lt;ol&gt;
+     * &lt;li&gt;
+     * Any resource may be null.
+     * &lt;/li&gt;
+     * &lt;li&gt;
+     * If the origin is null, it must be treated as equivalent to 
+     * DPoint( 0, 0 ).
+     * &lt;/li&gt;
+     * &lt;li&gt;
+     * If fillColor is null, the interior of the shape must not be drawn.
+     * &lt;/li&gt;
+     * &lt;li&gt;
+     * If edgeColor is null, the edge of the shape must not be drawn.
+     * &lt;/li&gt;
+     * &lt;/ol&gt;
+     * Any 
+     * 
+     * @param graphics  The graphics context that controls the 
+     *                  drawing area.
+     */
+    public abstract void draw( Graphics2D graphics );
+    
+    /**
+     * Default constructor. This method is equivalent to calling
+     * Shape( null, null, null ).
+     * 
+     * @see #Shape( DPoint, Color, Color)
+     */
+    public Shape()
+    {
+<span class="fc" id="L52">        this( null, null, null );</span>
+<span class="fc" id="L53">    }</span>
+    
+    /**
+     * Constructor. The origin is set to the given value, and 
+     * the fill and edge colors are set to null.
+     * 
+     * @param origin The given value for the origin.
+     * 
+     * @see #Shape( DPoint, Color, Color)
+     */
+    public Shape( DPoint origin )
+    {
+<span class="fc" id="L65">        this( origin, null, null );</span>
+<span class="fc" id="L66">    }</span>
+    
+    /**
+     * Constructor. Sets a Shape's origin, fill color and edge color
+     * to the given values. Any argument may be null.
+     * 
+     * @param origin    The given origin.
+     * @param fillColor The given fill color.
+     * @param edgeColor The given edge color.
+     */
+    public Shape( DPoint origin, Color fillColor, Color edgeColor )
+<span class="fc" id="L77">    {</span>
+<span class="fc" id="L78">        this.origin = origin;</span>
+<span class="fc" id="L79">        this.fillColor = fillColor;</span>
+<span class="fc" id="L80">        this.edgeColor = edgeColor;</span>
+<span class="fc" id="L81">    }</span>
+
+    /**
+     * Gets the origin of the containing Shape.
+     * 
+     * @return The origin of the containing Shape.
+     * 
+     * @see #setOrigin( DPoint ) 
+     */
+    public DPoint getOrigin()
+    {
+<span class="fc" id="L92">        return origin;</span>
+    }
+
+    /**clears
+     * Sets the origin of the containing Shape.
+     * 
+     * @param origin The origin to set.
+     * 
+     * @see #getOrigin() 
+     */
+    public void setOrigin(DPoint origin)
+    {
+<span class="fc" id="L104">        this.origin = origin;</span>
+<span class="fc" id="L105">    }</span>
+
+    /**
+     * Gets the fill color of the containing Shape.
+     * 
+     * @return The fill color of the containing Shape.
+     * 
+     * @see #setFillColor(java.awt.Color) 
+     */
+    public Color getFillColor()
+    {
+<span class="fc" id="L116">        return fillColor;</span>
+    }
+
+    /**
+     * Sets the fill color of the containing Shape.
+     * 
+     * @param fillColor The fill color for the containing Shape.
+     * 
+     * @see #setFillColor(java.awt.Color) 
+     */
+    public void setFillColor(Color fillColor)
+    {
+<span class="fc" id="L128">        this.fillColor = fillColor;</span>
+<span class="fc" id="L129">    }</span>
+
+    /**
+     * Gets the edge color of the containing Shape.
+     * 
+     * @return The edge color of the containing Shape.
+     * 
+     * @see #setEdgeColor(java.awt.Color) 
+     */
+    public Color getEdgeColor()
+    {
+<span class="fc" id="L140">        return edgeColor;</span>
+    }
+
+    /**
+     * Sets the fill color of the containing Shape.
+     * 
+     * @param edgeColor The edge color for the containing Shape.
+     * 
+     * @see #setFillColor(java.awt.Color) 
+     */
+    public void setEdgeColor(Color edgeColor)
+    {
+<span class="fc" id="L152">        this.edgeColor = edgeColor;</span>
+<span class="fc" id="L153">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

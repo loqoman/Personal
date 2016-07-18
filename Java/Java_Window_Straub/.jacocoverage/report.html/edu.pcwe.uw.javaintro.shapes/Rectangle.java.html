@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Rectangle.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCoverage analysis of project &quot;JavaIntro_-_Shapes&quot; (powered by JaCoCo from EclEmma)</a> &gt; <a href="index.source.html" class="el_package">edu.pcwe.uw.javaintro.shapes</a> &gt; <span class="el_source">Rectangle.java</span></div><h1>Rectangle.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.pcwe.uw.javaintro.shapes;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
+
+/**
+ * This class encapsulates a rectangular shape.
+ * 
+ * @see Shape
+ * 
+ * @author jack
+ */
+public class Rectangle extends Shape
+{
+    private double      width;
+    private double      height;
+    
+    /**
+     * Default constructor. Sets the origin, fill color and edge color to null;
+     * sets the width and height to 0.
+     */
+    public Rectangle()
+    {
+<span class="fc" id="L30">        this( null, null, null, 0, 0 );</span>
+<span class="fc" id="L31">    }</span>
+    
+    /**
+     * Constructor. Initializes the origin, width and height from the given
+     * parameters. Fill and edge colors are set to null.
+     * 
+     * @param origin    The given origin.
+     * @param width     The given width.
+     * @param height    The given height.
+     */
+    public Rectangle( DPoint origin, double width, double height )
+    {
+<span class="fc" id="L43">        this( origin, null, null, width, height );</span>
+<span class="fc" id="L44">    }</span>
+    
+    /**
+     * Constructor.
+     * 
+     * @param origin    The origin for the rectangle.
+     * @param fillColor The rectangle's fill color.
+     * @param edgeColor THe rectangle's edge color.
+     * @param width     THe rectangle's width.
+     * @param height    THe rectangle's  height.
+     * 
+     * @see Shape#Shape(edu.pcwe.uw.javaintro.shapes.DPoint, java.awt.Color, java.awt.Color) 
+     */
+    public Rectangle(
+        DPoint origin,
+        Color fillColor,
+        Color edgeColor, 
+        double width, 
+        double height 
+    )
+    {
+<span class="fc" id="L65">        super( origin, fillColor, edgeColor );</span>
+<span class="fc" id="L66">        this.width = width;</span>
+<span class="fc" id="L67">        this.height = height;</span>
+<span class="fc" id="L68">    }</span>
+    
+    /**
+     * Draws this rectangle.
+     * @param graph The graphics context drawing the rectangle.
+     */
+    public void draw( Graphics2D graph )
+    {
+<span class="fc" id="L76">        Color       save        = graph.getColor();</span>
+<span class="fc" id="L77">        Color       fill        = getFillColor();</span>
+<span class="fc" id="L78">        Color       edge        = getEdgeColor();</span>
+<span class="fc" id="L79">        Point       origin      = getOrigin().getPoint();</span>
+<span class="fc" id="L80">        int         iWidth      = getIntWidth();</span>
+<span class="fc" id="L81">        int         iHeight     = getIntHeight();</span>
+        
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if ( fill != null )</span>
+        {
+<span class="fc" id="L85">            graph.setColor( fill );</span>
+<span class="fc" id="L86">            graph.fillRect( origin.x, origin.y, iWidth, iHeight );</span>
+        }
+        
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if ( edge != null )</span>
+        {
+<span class="fc" id="L91">            graph.setColor( edge );</span>
+<span class="fc" id="L92">            graph.drawRect( origin.x, origin.y, iWidth, iHeight );</span>
+        }
+        
+<span class="fc" id="L95">        graph.setColor( save );</span>
+<span class="fc" id="L96">    }</span>
+
+    /**
+     * Gets the width of the rectangle.
+     * @return The width of the rectangle.
+     */
+    public double getWidth()
+    {
+<span class="fc" id="L104">        return width;</span>
+    }
+
+    /**
+     * Gets the width of the rectangle rounded to the nearest integer.
+     * @return The width of the rectangle rounded to the nearest integer..
+     */
+    public int getIntWidth()
+    {
+<span class="fc" id="L113">        int iWidth  = (int)Math.round( width );</span>
+<span class="fc" id="L114">        return iWidth;</span>
+    }
+
+    /**
+     * Sets the width of the rectangle to the given value.
+     * 
+     * @param width The width of the rectangle.
+     */
+    public void setWidth(double width)
+    {
+<span class="fc" id="L124">        this.width = width;</span>
+<span class="fc" id="L125">    }</span>
+
+    /**
+     * Gets the height of the rectangle.
+     * @return The height of the rectangle.
+     */
+    public double getHeight()
+    {
+<span class="fc" id="L133">        return height;</span>
+    }
+
+    /**
+     * Gets the height of the rectangle rounded to the nearest integer.
+     * @return The height of the rectangle rounded to the nearest integer..
+     */
+    public int getIntHeight()
+    {
+<span class="fc" id="L142">        int iHeight = (int)Math.round( height );</span>
+<span class="fc" id="L143">        return iHeight;</span>
+    }
+
+    /**
+     * Sets the height of the rectangle to the given value.
+     * @param height The height of the rectangle.
+     */
+    public void setHeight(double height)
+    {
+<span class="fc" id="L152">        this.height = height;</span>
+<span class="fc" id="L153">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
